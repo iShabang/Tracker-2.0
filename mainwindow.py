@@ -1,13 +1,15 @@
 from PyQt5.QtWidgets import (QApplication, QTabWidget, QWidget, QVBoxLayout,
                             QLabel, QLineEdit, QTableWidget, QMainWindow, QPushButton,
                             QHBoxLayout, QGridLayout, QDesktopWidget, QTableWidgetItem)
+
 import sqlite3
-from dbfunctions import *
+
+import dbfunctions
 
 class MainWindow(QMainWindow):
     def __init__(self):
-       super().__init__()
-       self.initUI()
+        super().__init__()
+        self.initUI()
       
     def initUI(self):
         self.setWindowTitle("Full Test Application")
@@ -18,13 +20,46 @@ class MainWindow(QMainWindow):
         data = testData()
         maintable = transactionTable(data)
 
+        addName = QLabel('Name')
+        addDate = QLabel('Date')
+        addCategory = QLabel('Category')
+        addButton = QPushButton('Add', self)
+
+        nameEdit = QLineEdit()
+        dateEdit = QLineEdit()
+        categoryEdit = QLineEdit()
+
+        grid_insert = QGridLayout()
+        grid_insert.addWidget(addName,1,0)
+        grid_insert.addWidget(addDate,2,0)
+        grid_insert.addWidget(addCategory,3,0)
+        grid_insert.addWidget(nameEdit,1,1)
+        grid_insert.addWidget(dateEdit,2,1)
+        grid_insert.addWidget(categoryEdit,3,1)
+        grid_insert.addWidget(addButton,4,0,4,3)
+
+        label_totalSpent = QLabel('Total Spent:')
+        label_category1 = QLabel('Category1:')
+        label_category2 = QLabel('Category2:')
+        label_category3 = QLabel('Category3:')
+        grid_totals = QGridLayout()
+        grid_totals.addWidget(label_totalSpent,1,0)
+        grid_totals.addWidget(label_category1,1,1)
+        grid_totals.addWidget(label_category2,2,0)
+        grid_totals.addWidget(label_category3,2,1)
+
+        addhbox = QHBoxLayout()
+        addhbox.addLayout(grid_insert)
+        addhbox.addLayout(grid_totals)
+        addhbox.addStretch(1)
+
         mainvbox = QVBoxLayout()
+        mainvbox.addLayout(addhbox)
         mainvbox.addWidget(maintable)
 
         self.mainWidget = QWidget()
         self.mainWidget.setLayout(mainvbox)
         self.setCentralWidget(self.mainWidget)
-
 
     def buildMenu(self):
         mainMenu = self.menuBar()
@@ -64,7 +99,7 @@ def transactionTable(transactions):
 def testData():
     connection = sqlite3.connect('tracker.db')
     c = connection.cursor()
-    data = GetTransByDateInterval(c, '2018-11-00', '2018-11-32')
+    data = dbfunctions.GetTransByDateInterval(c, '2018-11-00', '2018-11-32')
     connection.close()
     return data
 
