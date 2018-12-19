@@ -13,7 +13,7 @@ class MainWindow(QMainWindow):
       
     def initUI(self):
         self.setWindowTitle("Full Test Application")
-        self.setGeometry(10,10,500,400)
+        self.setGeometry(10,10,600,400)
         self.move(centerScreen(self))
         self.buildMenu()
 
@@ -22,21 +22,25 @@ class MainWindow(QMainWindow):
 
         label_name = QLabel('Name')
         label_date = QLabel('Date')
+        label_amount = QLabel('Amount')
         label_category = QLabel('Category')
         button_add = QPushButton('Add', self)
 
         edit_name = QLineEdit()
         edit_date = QLineEdit()
+        edit_amount = QLineEdit()
         edit_category = QLineEdit()
 
         grid_insert = QGridLayout()
         grid_insert.addWidget(label_name,1,0)
         grid_insert.addWidget(label_date,2,0)
-        grid_insert.addWidget(label_category,3,0)
+        grid_insert.addWidget(label_amount,3,0)
+        grid_insert.addWidget(label_category,4,0)
         grid_insert.addWidget(edit_name,1,1)
         grid_insert.addWidget(edit_date,2,1)
-        grid_insert.addWidget(edit_category,3,1)
-        grid_insert.addWidget(button_add,4,0,4,3)
+        grid_insert.addWidget(edit_amount,3,1)
+        grid_insert.addWidget(edit_category,4,1)
+        grid_insert.addWidget(button_add,5,0,5,3)
 
         label_totalSpent = QLabel('Total Spent:')
         label_info1 = QLabel('Info 1:')
