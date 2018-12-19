@@ -13,7 +13,7 @@ class MainWindow(QMainWindow):
       
     def initUI(self):
         self.setWindowTitle("Full Test Application")
-        self.setGeometry(10,10,600,400)
+        #self.setGeometry(10,10,500,400)
         self.move(centerScreen(self))
         self.buildMenu()
 
@@ -48,13 +48,12 @@ class MainWindow(QMainWindow):
         grid_totals.addWidget(label_category2,2,0)
         grid_totals.addWidget(label_category3,2,1)
 
-        addhbox = QHBoxLayout()
-        addhbox.addLayout(grid_insert)
-        addhbox.addLayout(grid_totals)
-        addhbox.addStretch(1)
+        hbox_topRow = QHBoxLayout()
+        hbox_topRow.addLayout(grid_insert)
+        hbox_topRow.addLayout(grid_totals)
 
         mainvbox = QVBoxLayout()
-        mainvbox.addLayout(addhbox)
+        mainvbox.addLayout(hbox_topRow)
         mainvbox.addWidget(maintable)
 
         self.mainWidget = QWidget()
