@@ -1,6 +1,9 @@
 from PyQt5.QtWidgets import (QApplication, QTabWidget, QWidget, QVBoxLayout,
                             QLabel, QLineEdit, QTableWidget, QMainWindow, QPushButton,
-                            QHBoxLayout, QGridLayout, QDesktopWidget, QTableWidgetItem)
+                            QHBoxLayout, QGridLayout, QDesktopWidget, QTableWidgetItem,
+                            QAbstractScrollArea, QHeaderView)
+
+import PyQt5.QtWidgets
 
 import sqlite3
 
@@ -94,6 +97,12 @@ def transactionTable(transactions):
     tableWidget.setRowCount(0)
     tableWidget.setColumnCount(5)
     tableWidget.setHorizontalHeaderLabels(["ID", "Name", "Date", "Price", "Category"])
+    header = tableWidget.horizontalHeader()
+    header.setSectionResizeMode(0, QHeaderView.Stretch)
+    header.setSectionResizeMode(1, QHeaderView.Stretch)
+    header.setSectionResizeMode(2, QHeaderView.Stretch)
+    header.setSectionResizeMode(3, QHeaderView.Stretch)
+    header.setSectionResizeMode(4, QHeaderView.Stretch)
     for row_number, row_data in enumerate(transactions):
         tableWidget.insertRow(row_number)
         for column_number, column_data in enumerate(row_data):
