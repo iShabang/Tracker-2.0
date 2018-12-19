@@ -13,7 +13,7 @@ class MainWindow(QMainWindow):
       
     def initUI(self):
         self.setWindowTitle("Full Test Application")
-        #self.setGeometry(10,10,500,400)
+        self.setGeometry(10,10,500,400)
         self.move(centerScreen(self))
         self.buildMenu()
 
@@ -39,14 +39,14 @@ class MainWindow(QMainWindow):
         grid_insert.addWidget(button_add,4,0,4,3)
 
         label_totalSpent = QLabel('Total Spent:')
-        label_category1 = QLabel('Category1:')
-        label_category2 = QLabel('Category2:')
-        label_category3 = QLabel('Category3:')
+        label_info1 = QLabel('Info 1:')
+        label_info2 = QLabel('Info 2:')
+        label_info3 = QLabel('Info 3:')
         grid_totals = QGridLayout()
         grid_totals.addWidget(label_totalSpent,1,0)
-        grid_totals.addWidget(label_category1,1,1)
-        grid_totals.addWidget(label_category2,2,0)
-        grid_totals.addWidget(label_category3,2,1)
+        grid_totals.addWidget(label_info1,1,1)
+        grid_totals.addWidget(label_info2,2,0)
+        grid_totals.addWidget(label_info3,2,1)
 
         hbox_topRow = QHBoxLayout()
         hbox_topRow.addLayout(grid_insert)
@@ -89,6 +89,7 @@ def transactionTable(transactions):
     tableWidget = QTableWidget()
     tableWidget.setRowCount(0)
     tableWidget.setColumnCount(5)
+    tableWidget.setHorizontalHeaderLabels(["ID", "Name", "Date", "Price", "Category"])
     for row_number, row_data in enumerate(transactions):
         tableWidget.insertRow(row_number)
         for column_number, column_data in enumerate(row_data):
