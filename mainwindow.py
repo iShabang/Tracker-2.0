@@ -89,21 +89,21 @@ def centerScreen(widget):
     return rectangle.topLeft()
 
 def transactionTable(transactions):
-    tableWidget = QTableWidget()
-    tableWidget.setRowCount(0)
-    tableWidget.setColumnCount(5)
-    tableWidget.setHorizontalHeaderLabels(["ID", "Name", "Date", "Price", "Category"])
-    header = tableWidget.horizontalHeader()
-    header.setSectionResizeMode(0, QHeaderView.Stretch)
-    header.setSectionResizeMode(1, QHeaderView.Stretch)
-    header.setSectionResizeMode(2, QHeaderView.Stretch)
-    header.setSectionResizeMode(3, QHeaderView.Stretch)
-    header.setSectionResizeMode(4, QHeaderView.Stretch)
+    table = QTableWidget()
+    table.setRowCount(0)
+    table.setColumnCount(5)
+    table.setHorizontalHeaderLabels(["ID", "Name", "Date", "Price", "Category"])
+    stretchTableHeaders(table, 5)
     for row_number, row_data in enumerate(transactions):
-        tableWidget.insertRow(row_number)
+        table.insertRow(row_number)
         for column_number, column_data in enumerate(row_data):
-            tableWidget.setItem(row_number, column_number, QTableWidgetItem(str(column_data)))
-    return tableWidget
+            table.setItem(row_number, column_number, QTableWidgetItem(str(column_data)))
+    return table
+
+def stretchTableHeaders(table, numColumns):
+    header = table.horizontalHeader()
+    for i in range(numColumns):
+        header.setSectionResizeMode(i, QHeaderView.Stretch)
 
 def testData():
     connection = sqlite3.connect('tracker.db')
