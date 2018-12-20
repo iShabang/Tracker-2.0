@@ -1,9 +1,7 @@
 from PyQt5.QtWidgets import (QApplication, QTabWidget, QWidget, QVBoxLayout,
                             QLabel, QLineEdit, QTableWidget, QMainWindow, QPushButton,
                             QHBoxLayout, QGridLayout, QDesktopWidget, QTableWidgetItem,
-                            QAbstractScrollArea, QHeaderView)
-
-import PyQt5.QtWidgets
+                            QAbstractScrollArea, QHeaderView, QSizePolicy)
 
 import sqlite3
 
@@ -33,6 +31,15 @@ class MainWindow(QMainWindow):
         edit_date = QLineEdit()
         edit_amount = QLineEdit()
         edit_category = QLineEdit()
+        edit_name.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        edit_date.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        edit_amount.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        edit_category.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+        label_totalSpent = QLabel('Total Spent:')
+        label_info1 = QLabel('Info 1:')
+        label_info2 = QLabel('Info 2:')
+        label_info3 = QLabel('Info 3:')
 
         grid_insert = QGridLayout()
         grid_insert.addWidget(label_name,1,0)
@@ -43,24 +50,17 @@ class MainWindow(QMainWindow):
         grid_insert.addWidget(edit_date,2,1)
         grid_insert.addWidget(edit_amount,3,1)
         grid_insert.addWidget(edit_category,4,1)
-        grid_insert.addWidget(button_add,5,0,5,3)
-
-        label_totalSpent = QLabel('Total Spent:')
-        label_info1 = QLabel('Info 1:')
-        label_info2 = QLabel('Info 2:')
-        label_info3 = QLabel('Info 3:')
-        grid_totals = QGridLayout()
-        grid_totals.addWidget(label_totalSpent,1,0)
-        grid_totals.addWidget(label_info1,1,1)
-        grid_totals.addWidget(label_info2,2,0)
-        grid_totals.addWidget(label_info3,2,1)
-
-        hbox_topRow = QHBoxLayout()
-        hbox_topRow.addLayout(grid_insert)
-        hbox_topRow.addLayout(grid_totals)
+        grid_insert.addWidget(label_totalSpent,1,2)
+        grid_insert.addWidget(label_info1,2,2)
+        grid_insert.addWidget(label_info2,3,2)
+        grid_insert.addWidget(label_info3,4,2)
+        grid_insert.addWidget(button_add,5,0,5,2)
+        grid_insert.setColumnStretch(0,0)
+        grid_insert.setColumnStretch(1,1)
+        grid_insert.setColumnStretch(2,3)
 
         mainvbox = QVBoxLayout()
-        mainvbox.addLayout(hbox_topRow)
+        mainvbox.addLayout(grid_insert)
         mainvbox.addWidget(maintable)
 
         self.mainWidget = QWidget()
