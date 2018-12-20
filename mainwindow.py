@@ -31,10 +31,6 @@ class MainWindow(QMainWindow):
         edit_date = QLineEdit()
         edit_amount = QLineEdit()
         edit_category = QLineEdit()
-        edit_name.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        edit_date.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        edit_amount.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        edit_category.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         label_totalSpent = QLabel('Total Spent:')
         label_info1 = QLabel('Info 1:')
