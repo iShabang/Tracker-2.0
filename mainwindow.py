@@ -2,7 +2,9 @@ from PyQt5.QtWidgets import (QApplication, QTabWidget, QWidget, QVBoxLayout,
                             QLabel, QLineEdit, QTableWidget, QMainWindow, QPushButton,
                             QHBoxLayout, QGridLayout, QDesktopWidget, QTableWidgetItem,
                             QAbstractScrollArea, QHeaderView, QSizePolicy, QComboBox,
-                            QCalendarWidget)
+                            QCalendarWidget, QDateEdit)
+
+from PyQt5.QtCore import QDate
 
 import sqlite3
 
@@ -38,6 +40,8 @@ class MainWindow(QMainWindow):
 
         button_add = QPushButton('Add', self)
 
+        dateSelect = DatePopup()
+
         label_totalSpent = QLabel('Total Spent:')
         label_info1 = QLabel('Info 1:')
         label_info2 = QLabel('Info 2:')
@@ -49,7 +53,7 @@ class MainWindow(QMainWindow):
         grid_insert.addWidget(label_amount,3,0)
         grid_insert.addWidget(label_category,4,0)
         grid_insert.addWidget(edit_name,1,1)
-        grid_insert.addWidget(edit_date,2,1)
+        grid_insert.addWidget(dateSelect,2,1)
         grid_insert.addWidget(edit_amount,3,1)
         grid_insert.addWidget(comboBox_category,4,1)
         grid_insert.addWidget(label_totalSpent,1,2)
@@ -79,6 +83,9 @@ class MainWindow(QMainWindow):
         helpMenu = mainMenu.addMenu('Help')
         fileMenu.addAction('Test')
 
+    def calendarPopup():
+        calendar = QCalendarWidget()
+
 
 class transactionTab(QWidget):
     def __init__(self,table):
@@ -87,6 +94,13 @@ class transactionTab(QWidget):
         layout.addWidget(table)
         self.setLayout(layout)
 
+class DatePopup(QDateEdit):
+    def __init__(self):
+        super().__init__()
+        self.setDate(QDate.currentDate())
+        self.setCalendarPopup(True)
+        self.setDisplayFormat('yyyy/MM/dd')
+        
 
 def centerScreen(widget):
     rectangle = widget.frameGeometry()
