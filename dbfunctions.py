@@ -1,43 +1,52 @@
 import sqlite3
 
-def DbConnect(func):
+def DbConnectQuery(func):
     def wrapper(*args):
         connection = sqlite3.connect('tracker.db')
         cursor = connection.cursor()
         data = func(cursor,*args)
         connection.close()
-        return data 
+        return data
     return wrapper
 
-@DbConnect
+def DbConnectAction(func):
+    def wrapper(*args):
+        connection = sqlite3.connect('tracker.db')
+        cursor = connection.cursor()
+        func(cursor,*args)
+        connection.close()
+        return func(cursor,*args)
+    return wrapper
+
+@DbConnectAction
 def AddTrans(cursor, values):
     cursor.execute("INSERT INTO trans(name, date, amount, cat_id) VALUES (?,?,?,?);", (values,))
 
-@DbConnect
+@DbConnectAction
 def AddManyTrans(cursor, values):
     cursor.executemany("INSERT INTO trans(name, date, amount, cat_id) VALUES (?,?,?,?);", values)
 
-@DbConnect
+@DbConnectAction
 def DelTrans(cursor, id_num):
     cursor.execute("DELETE FROM trans WHERE trans_id=?;", (id_num,))
 
-@DbConnect
+@DbConnectAction
 def AddCategory(cursor, name):
     cursor.execute("INSERT INTO category(name) VALUES(?)", (name,))
 
-@DbConnect
+@DbConnectAction
 def DelCategory(cursor, cat_id):
     cursor.execute("DELETE FROM category WHERE cat_id=?;", (cat_id,))
 
-@DbConnect
+@DbConnectAction
 def AddBill(cursor, values):
     cursor.execute("INSERT INTO bills(due_date,amount_due,cat_id,last_payment) VALUES (?,?,?,?)", (values,))
 
-@DbConnect
+@DbConnectAction
 def DelBill(cursor, bill_id):
     cursor.execute("DELETE FROM bills WHERE bill_id=?", (bill_id,))
 
-@DbConnect
+@DbConnectQuery
 def GetTransByDateInterval(cursor, lowdate, highdate):
     cursor.execute('''
     SELECT trans_id, name, date, amount, cat_id
@@ -45,7 +54,7 @@ def GetTransByDateInterval(cursor, lowdate, highdate):
     WHERE date >= ? AND date <= ?''', (lowdate,highdate))
     return cursor.fetchall()
 
-@DbConnect
+@DbConnectQuery
 def GetTransByName(cursor, name):
     cursor.execute('''
     SELECT trans_id, name, date, amount, cat_id
@@ -53,7 +62,7 @@ def GetTransByName(cursor, name):
     WHERE name LIKE ?''', (name,))
     return cursor.fetchall()
 
-@DbConnect
+@DbConnectQuery
 def GetTransByNameDate(cursor, name, lowdate, highdate):
     cursor.execute('''
     SELECT trans_id, name, date, amount, cat_id
@@ -62,7 +71,7 @@ def GetTransByNameDate(cursor, name, lowdate, highdate):
     AND name LIKE ?''', (lowdate,highdate, name))
     return cursor.fetchall()
 
-@DbConnect
+@DbConnectQuery
 def GetTransByCategory(cursor, cat_id):
     cursor.execute('''
     SELECT trans_id, name, date, amount, cat_id
@@ -70,7 +79,7 @@ def GetTransByCategory(cursor, cat_id):
     WHERE cat_id=?''', (cat_id,))
     return cursor.fetchall()
 
-@DbConnect
+@DbConnectQuery
 def GetTransByCategoryDate(cursor, cat_id, lowdate, highdate):
     cursor.execute("""
     SELECT trans_id, name, date, amount, cat_id
