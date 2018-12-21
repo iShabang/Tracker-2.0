@@ -8,8 +8,6 @@ from PyQt5.QtCore import QDate
 
 from PyQt5.QtGui import QDoubleValidator
 
-import sqlite3
-
 import dbfunctions
 
 class MainWindow(QMainWindow):
@@ -23,7 +21,7 @@ class MainWindow(QMainWindow):
         self.move(centerScreen(self))
         self.buildMenu()
 
-        data = testData()
+        data = dbfunctions.GetTransByDateInterval('2018-11-00', '2018-11-32')
         maintable = transactionTable(data)
 
         label_name = QLabel('Name')
@@ -130,11 +128,4 @@ def stretchTableHeaders(table, numColumns):
     header = table.horizontalHeader()
     for i in range(numColumns):
         header.setSectionResizeMode(i, QHeaderView.Stretch)
-
-def testData():
-    connection = sqlite3.connect('tracker.db')
-    c = connection.cursor()
-    data = dbfunctions.GetTransByDateInterval(c, '2018-11-00', '2018-11-32')
-    connection.close()
-    return data
 

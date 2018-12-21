@@ -1,5 +1,14 @@
 import sqlite3
 
+def DbConnect(func):
+    def wrapper(*args):
+        connection = sqlite3.connect('tracker.db')
+        cursor = connection.cursor()
+        data = func(cursor,*args)
+        connection.close()
+        return data 
+    return wrapper
+
 def AddTrans(cursor, values):
     cursor.execute("INSERT INTO trans(name, date, amount, cat_id) VALUES (?,?,?,?);", (values,))
 
@@ -21,13 +30,14 @@ def AddBill(cursor, values):
 def DelBill(cursor, bill_id):
     cursor.execute("DELETE FROM bills WHERE bill_id=?", (bill_id,))
 
+@DbConnect
 def GetTransByDateInterval(cursor, lowdate, highdate):
     cursor.execute('''
     SELECT trans_id, name, date, amount, cat_id
     FROM trans
     WHERE date >= ? AND date <= ?''', (lowdate,highdate))
     return cursor.fetchall()
-    
+
 def GetTransByName(cursor, name):
     cursor.execute('''
     SELECT trans_id, name, date, amount, cat_id
@@ -66,21 +76,4 @@ def NameSearchString(name):
     search_string="%{}%".format(name)
     return search_string
     
-def main():
-    conn = sqlite3.connect('tracker.db')
-    c = conn.cursor()
-    
-    AddBill(c, ('2018-11-05', 200.00, 1, 1))
 
-    c.execute("SELECT * FROM bills")
-    print(c.fetchone())
-
-    DelBill(c,(1,))
-
-    c.execute("SELECT * FROM bills")
-    print(c.fetchone())
-
-    conn.close()
-
-if __name__ == '__main__':
-    main()
