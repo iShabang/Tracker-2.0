@@ -1,7 +1,8 @@
 from PyQt5.QtWidgets import (QApplication, QTabWidget, QWidget, QVBoxLayout,
                             QLabel, QLineEdit, QTableWidget, QMainWindow, QPushButton,
                             QHBoxLayout, QGridLayout, QDesktopWidget, QTableWidgetItem,
-                            QAbstractScrollArea, QHeaderView, QSizePolicy)
+                            QAbstractScrollArea, QHeaderView, QSizePolicy, QComboBox,
+                            QCalendarWidget)
 
 import sqlite3
 
@@ -25,12 +26,17 @@ class MainWindow(QMainWindow):
         label_date = QLabel('Date')
         label_amount = QLabel('Amount')
         label_category = QLabel('Category')
-        button_add = QPushButton('Add', self)
+
+        comboBox_category = QComboBox()
+        comboBox_category.addItem('Category 1')
+        comboBox_category.addItem('Category 2')
+        comboBox_category.addItem('Category 3')
 
         edit_name = QLineEdit()
         edit_date = QLineEdit()
         edit_amount = QLineEdit()
-        edit_category = QLineEdit()
+
+        button_add = QPushButton('Add', self)
 
         label_totalSpent = QLabel('Total Spent:')
         label_info1 = QLabel('Info 1:')
@@ -45,7 +51,7 @@ class MainWindow(QMainWindow):
         grid_insert.addWidget(edit_name,1,1)
         grid_insert.addWidget(edit_date,2,1)
         grid_insert.addWidget(edit_amount,3,1)
-        grid_insert.addWidget(edit_category,4,1)
+        grid_insert.addWidget(comboBox_category,4,1)
         grid_insert.addWidget(label_totalSpent,1,2)
         grid_insert.addWidget(label_info1,2,2)
         grid_insert.addWidget(label_info2,3,2)
