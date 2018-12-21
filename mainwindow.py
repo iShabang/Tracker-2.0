@@ -6,6 +6,8 @@ from PyQt5.QtWidgets import (QApplication, QTabWidget, QWidget, QVBoxLayout,
 
 from PyQt5.QtCore import QDate
 
+from PyQt5.QtGui import QDoubleValidator
+
 import sqlite3
 
 import dbfunctions
@@ -36,7 +38,11 @@ class MainWindow(QMainWindow):
 
         edit_name = QLineEdit()
         edit_date = QLineEdit()
+
+        check_float = QDoubleValidator()
+        check_float.setDecimals(2)
         edit_amount = QLineEdit()
+        edit_amount.setValidator(check_float)
 
         button_add = QPushButton('Add', self)
 
@@ -94,13 +100,13 @@ class transactionTab(QWidget):
         layout.addWidget(table)
         self.setLayout(layout)
 
+
 def DatePopup():
     dateEdit = QDateEdit()
     dateEdit.setDate(QDate.currentDate())
     dateEdit.setCalendarPopup(True)
     dateEdit.setDisplayFormat('yyyy/MM/dd')
     return dateEdit
-        
 
 def centerScreen(widget):
     rectangle = widget.frameGeometry()
