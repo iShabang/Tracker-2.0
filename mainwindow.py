@@ -94,12 +94,12 @@ class transactionTab(QWidget):
         layout.addWidget(table)
         self.setLayout(layout)
 
-class DatePopup(QDateEdit):
-    def __init__(self):
-        super().__init__()
-        self.setDate(QDate.currentDate())
-        self.setCalendarPopup(True)
-        self.setDisplayFormat('yyyy/MM/dd')
+def DatePopup():
+    dateEdit = QDateEdit()
+    dateEdit.setDate(QDate.currentDate())
+    dateEdit.setCalendarPopup(True)
+    dateEdit.setDisplayFormat('yyyy/MM/dd')
+    return dateEdit
         
 
 def centerScreen(widget):
