@@ -21,7 +21,7 @@ class MainWindow(QMainWindow):
         self.move(centerScreen(self))
         self.buildMenu()
 
-        data = dbfunctions.GetTransByDateInterval('2018-11-00', '2018-11-32')
+        data = dbfunctions.GetTransByDateInterval(lowdate='2018-11-00', highdate='2018-11-32')
         maintable = transactionTable(data)
 
         label_name = QLabel('Name')
