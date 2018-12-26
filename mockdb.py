@@ -12,9 +12,9 @@ values = [("chipotle", "2018-11-06", 8, 1),
           ("phone case", "2018-11-09", 45.43, 2),
           ("headphones", "2018-11-08", 56.99, 2)]
 
-dbfunctions.AddCategory(c, "Food")
-dbfunctions.AddCategory(c, "Things")
-dbfunctions.AddManyTrans(c,values)
+dbfunctions.AddCategory("Food")
+dbfunctions.AddCategory("Things")
+dbfunctions.AddManyTrans(values)
 
 c.execute("SELECT * FROM trans")
 print(c.fetchall())
