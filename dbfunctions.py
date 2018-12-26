@@ -14,7 +14,7 @@ def DbConnectAction(func):
         connection = sqlite3.connect('tracker.db')
         cursor = connection.cursor()
         func(cursor,*args)
-        yield func(cursor,*args)
+        connection.commit()
         connection.close()
     return wrapper
 

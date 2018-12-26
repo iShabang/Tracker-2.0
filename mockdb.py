@@ -1,9 +1,6 @@
 import sqlite3
 import dbfunctions
 
-conn = sqlite3.connect('tracker.db')
-c = conn.cursor()
-
 values = [("chipotle", "2018-11-06", 8, 1),
           ("mcdonolds", "2018-11-04", 5.01, 1),
           ("canes", "2018-10-05", 10.25, 1),
@@ -15,10 +12,4 @@ values = [("chipotle", "2018-11-06", 8, 1),
 dbfunctions.AddCategory("Food")
 dbfunctions.AddCategory("Things")
 dbfunctions.AddManyTrans(values)
-
-c.execute("SELECT * FROM trans")
-print(c.fetchall())
-
-conn.commit()
-
-conn.close()
+print(dbfunctions.GetTransByDateInterval("2018-07-00","2018-12-00"))
