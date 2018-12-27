@@ -20,7 +20,7 @@ def DbConnectAction(func):
 
 @DbConnectAction
 def AddTrans(cursor, values):
-    cursor.execute("INSERT INTO trans(name, date, amount, cat_id) VALUES (?,?,?,?);", (values,))
+    cursor.execute("INSERT INTO trans(name, date, amount, cat_id) VALUES (?,?,?,?);", values)
 
 @DbConnectAction
 def AddManyTrans(cursor, values):

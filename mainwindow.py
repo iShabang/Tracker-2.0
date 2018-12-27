@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import (QApplication, QTabWidget, QWidget, QVBoxLayout,
                             QLabel, QLineEdit, QTableWidget, QMainWindow, QPushButton,
                             QHBoxLayout, QGridLayout, QDesktopWidget, QTableWidgetItem,
                             QAbstractScrollArea, QHeaderView, QSizePolicy, QComboBox,
-                            QCalendarWidget, QDateEdit)
+                            QCalendarWidget, QDateEdit,QDialog)
 
 from PyQt5.QtCore import QDate
 
@@ -21,7 +21,7 @@ class MainWindow(QMainWindow):
         self.move(centerScreen(self))
         self.buildMenu()
 
-        data = dbfunctions.GetTransByDateInterval(lowdate='2018-11-00', highdate='2018-11-32')
+        data = dbfunctions.GetTransByDateInterval(lowdate='2017-00-00', highdate='2019-00-00')
         maintable = transactionTable(data)
 
         label_name = QLabel('Name')
@@ -43,6 +43,7 @@ class MainWindow(QMainWindow):
         edit_amount.setValidator(check_float)
 
         button_add = QPushButton('Add', self)
+        button_add.clicked.connect(self.openAddDialog)
 
         dateSelect = DatePopup()
 
@@ -90,20 +91,45 @@ class MainWindow(QMainWindow):
     def calendarPopup():
         calendar = QCalendarWidget()
 
+    def openAddDialog(self):
+        addWindow = QDialog()
+        edit_name = QLineEdit()
+        edit_name.setPlaceholderText('Name')
+        edit_date = DatePopup()
+        edit_amount = QLineEdit()
+        edit_amount.setPlaceholderText('Price')
+        comboBox_category = QComboBox()
+        comboBox_category.addItem('Category 1')
+        comboBox_category.addItem('Category 2')
+        comboBox_category.addItem('Category 3')
+        addButton = QPushButton('Submit', addWindow)
 
-class transactionTab(QWidget):
-    def __init__(self,table):
-        super().__init__()
-        layout = QVBoxLayout()
-        layout.addWidget(table)
-        self.setLayout(layout)
+        def submit():
+            name = edit_name.text()
+            date = edit_date.text()
+            amount = edit_amount.text()
+            category = comboBox_category.currentText()
+            data = [name,date,float(amount),1]
+            print(data)
+            dbfunctions.AddTrans(values=(name,date,amount,1))
+
+        addButton.clicked.connect(submit)
+        mainlayout = QVBoxLayout()
+        mainlayout.addWidget(edit_name)
+        mainlayout.addWidget(edit_date)
+        mainlayout.addWidget(edit_amount)
+        mainlayout.addWidget(comboBox_category)
+        mainlayout.addWidget(addButton)
+        addWindow.setLayout(mainlayout)
+        addWindow.exec_()
+        
 
 
 def DatePopup():
     dateEdit = QDateEdit()
     dateEdit.setDate(QDate.currentDate())
     dateEdit.setCalendarPopup(True)
-    dateEdit.setDisplayFormat('yyyy/MM/dd')
+    dateEdit.setDisplayFormat('yyyy-MM-dd')
     return dateEdit
 
 def centerScreen(widget):
