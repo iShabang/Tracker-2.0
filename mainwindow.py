@@ -23,6 +23,9 @@ class MainWindow(QMainWindow):
 
         data = dbfunctions.GetTransByDateInterval(lowdate='2017-00-00', highdate='2019-00-00')
         maintable = transactionTable(data)
+        amountSpent = sum(getColumnSpent(data, 3))
+        amountEarned = sum(getColumnEarned(data, 3))
+        amountSaved = amountEarned - amountSpent
 
         label_name = QLabel('Name')
         label_date = QLabel('Date')
@@ -48,9 +51,13 @@ class MainWindow(QMainWindow):
         dateSelect = DatePopup()
 
         label_totalSpent = QLabel('Total Spent:')
-        label_info1 = QLabel('Info 1:')
-        label_info2 = QLabel('Info 2:')
+        label_info1 = QLabel('Total Earned:')
+        label_info2 = QLabel('Saved:')
         label_info3 = QLabel('Info 3:')
+
+        label_totalSpentValue = QLabel(str(amountSpent))
+        label_totalEarnedValue = QLabel(str(amountEarned))
+        label_totalSavedValue = QLabel(str(amountSaved))
 
         grid_insert = QGridLayout()
         grid_insert.addWidget(label_totalSpent,0,0)
@@ -58,7 +65,10 @@ class MainWindow(QMainWindow):
         grid_insert.addWidget(label_info2,2,0)
         grid_insert.addWidget(label_info3,3,0)
         grid_insert.addWidget(button_add,4,0)
-        #grid_insert.setColumnStretch(0,0)
+        grid_insert.addWidget(label_totalSpentValue,0,1)
+        grid_insert.addWidget(label_totalEarnedValue,1,1)
+        grid_insert.addWidget(label_totalSavedValue,2,1)
+        grid_insert.setColumnStretch(2,1)
 
         mainvbox = QVBoxLayout()
         mainvbox.addLayout(grid_insert)
@@ -138,10 +148,18 @@ def transactionTable(transactions):
         table.insertRow(row_number)
         for column_number, column_data in enumerate(row_data):
             table.setItem(row_number, column_number, QTableWidgetItem(str(column_data)))
+    table.setSortingEnabled(True)
     return table
 
 def stretchTableHeaders(table, numColumns):
     header = table.horizontalHeader()
     for i in range(numColumns):
         header.setSectionResizeMode(i, QHeaderView.Stretch)
+
+def getColumnSpent(data, column):
+    return [row[column] for row in data if row[4] != 3]
+
+def getColumnEarned(data, column):
+    return [row[column] for row in data if row[4] == 3]
+
 
