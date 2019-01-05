@@ -45,8 +45,11 @@ class MainWindow(QMainWindow):
         edit_amount = QLineEdit()
         edit_amount.setValidator(check_float)
 
-        button_add = QPushButton('Add', self)
+        button_add = QPushButton('Add Transaction', self)
         button_add.clicked.connect(self.openAddDialog)
+
+        button_addCategory = QPushButton('Add Category', self)
+        button_addCategory.clicked.connect(self.openAddCatDialog)
 
         dateSelect = DatePopup()
 
@@ -65,6 +68,7 @@ class MainWindow(QMainWindow):
         grid_insert.addWidget(label_info2,2,0)
         grid_insert.addWidget(label_info3,3,0)
         grid_insert.addWidget(button_add,4,0)
+        grid_insert.addWidget(button_addCategory,4,1)
         grid_insert.addWidget(label_totalSpentValue,0,1)
         grid_insert.addWidget(label_totalEarnedValue,1,1)
         grid_insert.addWidget(label_totalSavedValue,2,1)
@@ -93,6 +97,7 @@ class MainWindow(QMainWindow):
 
     def openAddDialog(self):
         addWindow = QDialog()
+        addWindow.setWindowTitle("Adding Transaction")
         edit_name = QLineEdit()
         edit_name.setPlaceholderText('Name')
         edit_amount = QLineEdit()
@@ -123,7 +128,24 @@ class MainWindow(QMainWindow):
         addWindow.setLayout(mainlayout)
         addWindow.exec_()
         
+    def openAddCatDialog(self):
+        addWindow = QDialog()
+        addWindow.setWindowTitle("Adding Category")
+        edit_category = QLineEdit()
+        edit_category.setPlaceholderText('Category')
+        addButton = QPushButton('Submit', addWindow)
 
+        def submit():
+            category = edit_category.text()
+            print(category)
+            dbfunctions.AddCategory(name=(category))
+
+        addButton.clicked.connect(submit)
+        mainlayout = QVBoxLayout()
+        mainlayout.addWidget(edit_category)
+        mainlayout.addWidget(addButton)
+        addWindow.setLayout(mainlayout)
+        addWindow.exec_()
 
 def DatePopup():
     dateEdit = QDateEdit()
