@@ -1,18 +1,9 @@
-from PyQt5.QtWidgets import (QApplication, QTabWidget, QWidget, QVBoxLayout,
-                            QLabel, QLineEdit, QTableWidget, QMainWindow, QPushButton,
-                            QHBoxLayout, QGridLayout, QDesktopWidget, QTableWidgetItem,
-                            QAbstractScrollArea, QHeaderView, QSizePolicy, QComboBox,
-                            QCalendarWidget, QDateEdit,QDialog)
-
-from PyQt5.QtCore import QDate
-from PyQt5 import QtWidgets
-
-from PyQt5.QtGui import QDoubleValidator
+from PyQt5 import QtWidgets, QtGui, QtCore
 
 import dbfunctions
 import models
 
-class MainWindow(QMainWindow):
+class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.initUI()
@@ -28,8 +19,11 @@ class MainWindow(QMainWindow):
         headers = ["ID", "Name", "Date", "Price", "Category"]
         mainTable = QtWidgets.QTableView()
         tableModel = models.tableModel(data=data, headers=headers)
-        mainTable.setModel(tableModel)
+        proxyModel = QtCore.QSortFilterProxyModel()
+        proxyModel.setSourceModel(tableModel)
+        mainTable.setModel(proxyModel)
         stretchTableHeaders(mainTable, 5)
+        mainTable.setSortingEnabled(True)
 
         """Info Labels Setup"""
         amountSpent = sum(getColumnSpent(data, 3))
@@ -86,17 +80,17 @@ class MainWindow(QMainWindow):
         addWindow.setWindowTitle("Adding Transaction")
         edit_name = QtWidgets.QLineEdit()
         edit_name.setPlaceholderText('Name')
-        check_float = QDoubleValidator()
+        check_float = QtGui.QDoubleValidator()
         check_float.setDecimals(2)
-        edit_amount = QLineEdit()
+        edit_amount = QtWidgets.QLineEdit()
         edit_amount.setValidator(check_float)
         edit_amount.setPlaceholderText('Price')
-        comboBox_category = QComboBox()
+        comboBox_category = QtWidgets.QComboBox()
         comboBox_category.addItem('Category 1')
         comboBox_category.addItem('Category 2')
         comboBox_category.addItem('Category 3')
         edit_date = DatePopup()
-        addButton = QPushButton('Submit', addWindow)
+        addButton = QtWidgets.QPushButton('Submit', addWindow)
 
         def submit():
             name = edit_name.text()
@@ -108,7 +102,7 @@ class MainWindow(QMainWindow):
             dbfunctions.AddTrans(values=(name,date,amount,1))
 
         addButton.clicked.connect(submit)
-        mainlayout = QVBoxLayout()
+        mainlayout = QtWidgets.QVBoxLayout()
         mainlayout.addWidget(edit_name)
         mainlayout.addWidget(edit_amount)
         mainlayout.addWidget(comboBox_category)
@@ -118,11 +112,11 @@ class MainWindow(QMainWindow):
         addWindow.exec_()
         
     def openAddCatDialog(self):
-        addWindow = QDialog()
+        addWindow = QtWidgets.QDialog()
         addWindow.setWindowTitle("Adding Category")
-        edit_category = QLineEdit()
+        edit_category = QtWidgets.QLineEdit()
         edit_category.setPlaceholderText('Category')
-        addButton = QPushButton('Submit', addWindow)
+        addButton = QtWidgets.QPushButton('Submit', addWindow)
 
         def submit():
             category = edit_category.text()
@@ -137,20 +131,20 @@ class MainWindow(QMainWindow):
         addWindow.exec_()
 
 def DatePopup():
-    dateEdit = QDateEdit()
-    dateEdit.setDate(QDate.currentDate())
+    dateEdit = QtWidgets.QDateEdit()
+    dateEdit.setDate(QtCore.QDate.currentDate())
     dateEdit.setCalendarPopup(True)
     dateEdit.setDisplayFormat('yyyy-MM-dd')
     return dateEdit
 
 def centerScreen(widget):
     rectangle = widget.frameGeometry()
-    centerPoint = QDesktopWidget().availableGeometry().center()
+    centerPoint = QtWidgets.QDesktopWidget().availableGeometry().center()
     rectangle.moveCenter(centerPoint)
     return rectangle.topLeft()
 
 def transactionTable(transactions):
-    table = QTableWidget()
+    table = QtWidgets.QTableWidget()
     table.setRowCount(0)
     table.setColumnCount(5)
     table.setHorizontalHeaderLabels(["ID", "Name", "Date", "Price", "Category"])
@@ -165,7 +159,7 @@ def transactionTable(transactions):
 def stretchTableHeaders(table, numColumns):
     header = table.horizontalHeader()
     for i in range(numColumns):
-        header.setSectionResizeMode(i, QHeaderView.Stretch)
+        header.setSectionResizeMode(i, QtWidgets.QHeaderView.Stretch)
 
 def getColumnSpent(data, column):
     return [row[column] for row in data if row[4] != 3]
