@@ -9,6 +9,7 @@ from PyQt5.QtCore import QDate
 from PyQt5.QtGui import QDoubleValidator
 
 import dbfunctions
+import models
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -21,63 +22,44 @@ class MainWindow(QMainWindow):
         self.move(centerScreen(self))
         self.buildMenu()
 
+        """Table Setup"""
         data = dbfunctions.GetTransByDateInterval(lowdate='2017-00-00', highdate='2019-00-00')
         maintable = transactionTable(data)
+
+        """Info Labels Setup"""
         amountSpent = sum(getColumnSpent(data, 3))
         amountEarned = sum(getColumnEarned(data, 3))
         amountSaved = amountEarned - amountSpent
-
-        label_name = QLabel('Name')
-        label_date = QLabel('Date')
-        label_amount = QLabel('Amount')
-        label_category = QLabel('Category')
-
-        comboBox_category = QComboBox()
-        comboBox_category.addItem('Category 1')
-        comboBox_category.addItem('Category 2')
-        comboBox_category.addItem('Category 3')
-
-        edit_name = QLineEdit()
-        edit_date = QLineEdit()
-
-        check_float = QDoubleValidator()
-        check_float.setDecimals(2)
-        edit_amount = QLineEdit()
-        edit_amount.setValidator(check_float)
-
-        button_add = QPushButton('Add Transaction', self)
-        button_add.clicked.connect(self.openAddDialog)
-
-        button_addCategory = QPushButton('Add Category', self)
-        button_addCategory.clicked.connect(self.openAddCatDialog)
-
-        dateSelect = DatePopup()
-
         label_totalSpent = QLabel('Total Spent:')
-        label_info1 = QLabel('Total Earned:')
-        label_info2 = QLabel('Saved:')
-        label_info3 = QLabel('Info 3:')
-
+        label_totalEarned = QLabel('Total Earned:')
+        label_saved = QLabel('Saved:')
         label_totalSpentValue = QLabel(str(amountSpent))
         label_totalEarnedValue = QLabel(str(amountEarned))
         label_totalSavedValue = QLabel(str(amountSaved))
 
+        """Buttons"""
+        button_add = QPushButton('Add Transaction', self)
+        button_add.clicked.connect(self.openAddDialog)
+        button_addCategory = QPushButton('Add Category', self)
+        button_addCategory.clicked.connect(self.openAddCatDialog)
+
+
+        """Top Grid"""
         grid_insert = QGridLayout()
         grid_insert.addWidget(label_totalSpent,0,0)
-        grid_insert.addWidget(label_info1,1,0)
-        grid_insert.addWidget(label_info2,2,0)
-        grid_insert.addWidget(label_info3,3,0)
-        grid_insert.addWidget(button_add,4,0)
-        grid_insert.addWidget(button_addCategory,4,1)
+        grid_insert.addWidget(label_totalEarned,1,0)
+        grid_insert.addWidget(label_saved,2,0)
+        grid_insert.addWidget(button_add,3,0)
+        grid_insert.addWidget(button_addCategory,3,1)
         grid_insert.addWidget(label_totalSpentValue,0,1)
         grid_insert.addWidget(label_totalEarnedValue,1,1)
         grid_insert.addWidget(label_totalSavedValue,2,1)
         grid_insert.setColumnStretch(2,1)
 
+        """Main Layout"""
         mainvbox = QVBoxLayout()
         mainvbox.addLayout(grid_insert)
         mainvbox.addWidget(maintable)
-
         self.mainWidget = QWidget()
         self.mainWidget.setLayout(mainvbox)
         self.setCentralWidget(self.mainWidget)
@@ -100,7 +82,10 @@ class MainWindow(QMainWindow):
         addWindow.setWindowTitle("Adding Transaction")
         edit_name = QLineEdit()
         edit_name.setPlaceholderText('Name')
+        check_float = QDoubleValidator()
+        check_float.setDecimals(2)
         edit_amount = QLineEdit()
+        edit_amount.setValidator(check_float)
         edit_amount.setPlaceholderText('Price')
         comboBox_category = QComboBox()
         comboBox_category.addItem('Category 1')
