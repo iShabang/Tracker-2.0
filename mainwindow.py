@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import (QApplication, QTabWidget, QWidget, QVBoxLayout,
                             QCalendarWidget, QDateEdit,QDialog)
 
 from PyQt5.QtCore import QDate
+from PyQt5 import QtWidgets
 
 from PyQt5.QtGui import QDoubleValidator
 
@@ -24,28 +25,30 @@ class MainWindow(QMainWindow):
 
         """Table Setup"""
         data = dbfunctions.GetTransByDateInterval(lowdate='2017-00-00', highdate='2019-00-00')
-        maintable = transactionTable(data)
+        headers = ["ID", "Name", "Date", "Price", "Category"]
+        mainTable = QtWidgets.QTableView()
+        tableModel = models.tableModel(data=data, headers=headers)
+        mainTable.setModel(tableModel)
 
         """Info Labels Setup"""
         amountSpent = sum(getColumnSpent(data, 3))
         amountEarned = sum(getColumnEarned(data, 3))
         amountSaved = amountEarned - amountSpent
-        label_totalSpent = QLabel('Total Spent:')
-        label_totalEarned = QLabel('Total Earned:')
-        label_saved = QLabel('Saved:')
-        label_totalSpentValue = QLabel(str(amountSpent))
-        label_totalEarnedValue = QLabel(str(amountEarned))
-        label_totalSavedValue = QLabel(str(amountSaved))
+        label_totalSpent = QtWidgets.QLabel('Total Spent:')
+        label_totalEarned = QtWidgets.QLabel('Total Earned:')
+        label_saved = QtWidgets.QLabel('Saved:')
+        label_totalSpentValue = QtWidgets.QLabel(str(amountSpent))
+        label_totalEarnedValue = QtWidgets.QLabel(str(amountEarned))
+        label_totalSavedValue = QtWidgets.QLabel(str(amountSaved))
 
         """Buttons"""
-        button_add = QPushButton('Add Transaction', self)
+        button_add = QtWidgets.QPushButton('Add Transaction', self)
         button_add.clicked.connect(self.openAddDialog)
-        button_addCategory = QPushButton('Add Category', self)
+        button_addCategory = QtWidgets.QPushButton('Add Category', self)
         button_addCategory.clicked.connect(self.openAddCatDialog)
 
-
         """Top Grid"""
-        grid_insert = QGridLayout()
+        grid_insert = QtWidgets.QGridLayout()
         grid_insert.addWidget(label_totalSpent,0,0)
         grid_insert.addWidget(label_totalEarned,1,0)
         grid_insert.addWidget(label_saved,2,0)
@@ -57,10 +60,10 @@ class MainWindow(QMainWindow):
         grid_insert.setColumnStretch(2,1)
 
         """Main Layout"""
-        mainvbox = QVBoxLayout()
+        mainvbox = QtWidgets.QVBoxLayout()
         mainvbox.addLayout(grid_insert)
-        mainvbox.addWidget(maintable)
-        self.mainWidget = QWidget()
+        mainvbox.addWidget(mainTable)
+        self.mainWidget = QtWidgets.QWidget()
         self.mainWidget.setLayout(mainvbox)
         self.setCentralWidget(self.mainWidget)
 
@@ -75,12 +78,12 @@ class MainWindow(QMainWindow):
         fileMenu.addAction('Test')
 
     def calendarPopup():
-        calendar = QCalendarWidget()
+        calendar = QtWidgets.QCalendarWidget()
 
     def openAddDialog(self):
-        addWindow = QDialog()
+        addWindow = QtWidgets.QDialog()
         addWindow.setWindowTitle("Adding Transaction")
-        edit_name = QLineEdit()
+        edit_name = QtWidgets.QLineEdit()
         edit_name.setPlaceholderText('Name')
         check_float = QDoubleValidator()
         check_float.setDecimals(2)
