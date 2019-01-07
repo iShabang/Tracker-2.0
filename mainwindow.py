@@ -29,6 +29,7 @@ class MainWindow(QMainWindow):
         mainTable = QtWidgets.QTableView()
         tableModel = models.tableModel(data=data, headers=headers)
         mainTable.setModel(tableModel)
+        stretchTableHeaders(mainTable, 5)
 
         """Info Labels Setup"""
         amountSpent = sum(getColumnSpent(data, 3))
