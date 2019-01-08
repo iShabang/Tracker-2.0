@@ -100,6 +100,7 @@ class MainWindow(QtWidgets.QMainWindow):
             data = [name,date,float(amount),1]
             print(data)
             dbfunctions.AddTrans(values=(name,date,amount,1))
+            addWindow.close()
 
         addButton.clicked.connect(submit)
         mainlayout = QtWidgets.QVBoxLayout()
@@ -122,6 +123,7 @@ class MainWindow(QtWidgets.QMainWindow):
             category = edit_category.text()
             print(category)
             dbfunctions.AddCategory(name=(category))
+            addWindow.close()
 
         addButton.clicked.connect(submit)
         mainlayout = QtWidgets.QVBoxLayout()
