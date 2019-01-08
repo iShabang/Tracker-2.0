@@ -124,7 +124,7 @@ class MainWindow(QtWidgets.QMainWindow):
             dbfunctions.AddCategory(name=(category))
 
         addButton.clicked.connect(submit)
-        mainlayout = QVBoxLayout()
+        mainlayout = QtWidgets.QVBoxLayout()
         mainlayout.addWidget(edit_category)
         mainlayout.addWidget(addButton)
         addWindow.setLayout(mainlayout)
