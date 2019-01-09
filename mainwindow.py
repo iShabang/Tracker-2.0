@@ -17,6 +17,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """Table Setup"""
         data = dbfunctions.GetTransByDateInterval(lowdate='2017-00-00', highdate='2019-00-00')
         headers = ["ID", "Name", "Date", "Price", "Category"]
+        categories = dbfunctions.GetAllCategories()
         mainTable = QtWidgets.QTableView()
         tableModel = models.tableModel(data=data, headers=headers)
         proxyModel = QtCore.QSortFilterProxyModel()

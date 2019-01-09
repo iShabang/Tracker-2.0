@@ -49,9 +49,9 @@ def DelBill(cursor, bill_id):
 @DbConnectQuery
 def GetTransByDateInterval(cursor, lowdate, highdate):
     cursor.execute('''
-    SELECT trans_id, name, date, amount, cat_id
-    FROM trans
-    WHERE date >= ? AND date <= ?''', (lowdate,highdate))
+    SELECT trans.trans_id, trans.name, trans.date, trans.amount, category.name
+    FROM trans INNER JOIN category ON trans.cat_id = category.cat_id
+    WHERE date >= ? AND date <= ?''',(lowdate,highdate))
     return cursor.fetchall()
 
 @DbConnectQuery
@@ -86,6 +86,13 @@ def GetTransByCategoryDate(cursor, cat_id, lowdate, highdate):
     FROM trans
     WHERE date >= ? AND date <= ?
     AND cat_id=?""", (lowdate, highdate, cat_id))
+    return cursor.fetchall()
+
+@DbConnectQuery
+def GetAllCategories(cursor):
+    cursor.execute("""
+    SELECT cat_id, name
+    FROM category""")
     return cursor.fetchall()
 
 def DateSearchString(year, month, day):
