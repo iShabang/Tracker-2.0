@@ -10,10 +10,7 @@ c = conn.cursor()
 
 c.execute('''CREATE TABLE IF NOT EXISTS category (
                 cat_id INTEGER PRIMARY KEY,
-                name TEXT,
-                major_id INTEGER,
-                FOREIGN KEY(major_id)
-                REFERENCES category(cat_id) ON DELETE SET NULL);''')
+                name TEXT);''')
 
 c.execute('''CREATE TABLE IF NOT EXISTS trans (
                 trans_id INTEGER PRIMARY KEY,
