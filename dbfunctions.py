@@ -57,16 +57,16 @@ def GetTransByDateInterval(cursor, lowdate, highdate):
 @DbConnectQuery
 def GetTransByName(cursor, name):
     cursor.execute('''
-    SELECT trans_id, name, date, amount, cat_id
-    FROM trans
+    SELECT trans.trans_id, trans.name, trans.date, trans.amount, category.name
+    FROM trans INNER JOIN category ON trans.cat_id = category.cat_id
     WHERE name LIKE ?''', (name,))
     return cursor.fetchall()
 
 @DbConnectQuery
 def GetTransByNameDate(cursor, name, lowdate, highdate):
     cursor.execute('''
-    SELECT trans_id, name, date, amount, cat_id
-    FROM trans
+    SELECT trans.trans_id, trans.name, trans.date, trans.amount, category.name
+    FROM trans INNER JOIN category ON trans.cat_id = category.cat_id
     WHERE date >= ? AND date <= ?
     AND name LIKE ?''', (lowdate,highdate, name))
     return cursor.fetchall()
@@ -74,16 +74,16 @@ def GetTransByNameDate(cursor, name, lowdate, highdate):
 @DbConnectQuery
 def GetTransByCategory(cursor, cat_id):
     cursor.execute('''
-    SELECT trans_id, name, date, amount, cat_id
-    FROM trans
+    SELECT trans.trans_id, trans.name, trans.date, trans.amount, category.name
+    FROM trans INNER JOIN category ON trans.cat_id = category.cat_id
     WHERE cat_id=?''', (cat_id,))
     return cursor.fetchall()
 
 @DbConnectQuery
 def GetTransByCategoryDate(cursor, cat_id, lowdate, highdate):
     cursor.execute("""
-    SELECT trans_id, name, date, amount, cat_id
-    FROM trans
+    SELECT trans.trans_id, trans.name, trans.date, trans.amount, category.name
+    FROM trans INNER JOIN category ON trans.cat_id = category.cat_id
     WHERE date >= ? AND date <= ?
     AND cat_id=?""", (lowdate, highdate, cat_id))
     return cursor.fetchall()
