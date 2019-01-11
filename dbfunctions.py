@@ -31,8 +31,8 @@ def DelTrans(cursor, id_num):
     cursor.execute("DELETE FROM trans WHERE trans_id=?;", (id_num,))
 
 @DbConnectAction
-def AddCategory(cursor, name, income = False):
-    cursor.execute("INSERT INTO category(name, income) VALUES(?,?)", (name,income))
+def AddCategory(cursor, name, income):
+    cursor.execute("INSERT INTO category(name, income) VALUES (?,?);", (name,income))
 
 @DbConnectAction
 def DelCategory(cursor, cat_id):
@@ -91,7 +91,7 @@ def GetTransByCategoryDate(cursor, cat_id, lowdate, highdate):
 @DbConnectQuery
 def GetAllCategories(cursor):
     cursor.execute("""
-    SELECT cat_id, name
+    SELECT cat_id, name, income
     FROM category""")
     return cursor.fetchall()
 

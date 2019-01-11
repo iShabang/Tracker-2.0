@@ -11,7 +11,7 @@ c = conn.cursor()
 c.execute('''CREATE TABLE IF NOT EXISTS category (
                 cat_id INTEGER PRIMARY KEY,
                 name TEXT,
-                income BOOL);''')
+                income INTEGER);''')
 
 c.execute('''CREATE TABLE IF NOT EXISTS trans (
                 trans_id INTEGER PRIMARY KEY,

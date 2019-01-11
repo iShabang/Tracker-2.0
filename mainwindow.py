@@ -27,8 +27,9 @@ class MainWindow(QtWidgets.QMainWindow):
         mainTable.setSortingEnabled(True)
 
         """Info Labels Setup"""
-        amountSpent = sum(getColumnSpent(data, 3))
-        amountEarned = sum(getColumnEarned(data, 3))
+        incomeCategory = findIncomeCategory()
+        amountSpent = sum(getColumnSpent(data, 3, incomeCategory))
+        amountEarned = sum(getColumnEarned(data, 3, incomeCategory))
         amountSaved = amountEarned - amountSpent
         label_totalSpent = QtWidgets.QLabel('Total Spent:')
         label_totalEarned = QtWidgets.QLabel('Total Earned:')
@@ -164,10 +165,28 @@ def stretchTableHeaders(table, numColumns):
     for i in range(numColumns):
         header.setSectionResizeMode(i, QtWidgets.QHeaderView.Stretch)
 
-def getColumnSpent(data, column):
-    return [row[column] for row in data if row[4] != 3]
+def getColumnSpent(data, column, incomeCategoryList):
+    spentList = []
+    for row in data:
+        for i in incomeCategoryList:
+            if row[4] != i:
+                    spentList.append(row[column])
+    return spentList
 
-def getColumnEarned(data, column):
-    return [row[column] for row in data if row[4] == 3]
+def getColumnEarned(data, column, incomeCategoryList):
+    earnedList = []
+    for row in data:
+        for i in incomeCategoryList:
+            if row[4] == i:
+                earnedList.append(row[column])
+    return earnedList
+
+def findIncomeCategory():
+    incomeCategoryList = []
+    categoryData = dbfunctions.GetAllCategories()
+    for row in categoryData:
+        if row[2] == 1:
+            incomeCategoryList.append(row[1])
+    return incomeCategoryList
 
 

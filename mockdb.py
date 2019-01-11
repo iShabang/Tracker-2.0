@@ -10,8 +10,8 @@ values = [("chipotle", "2018-11-06", 8, 1),
           ("headphones", "2018-11-08", 56.99, 2),
           ("Check","2018-12-27", 500.00, 3)]
 
-dbfunctions.AddCategory(name="Food")
-dbfunctions.AddCategory(name="Things")
-dbfunctions.AddCategory(name="Income", income=True)
+dbfunctions.AddCategory(name="Food", income=0)
+dbfunctions.AddCategory(name="Things", income=0)
+dbfunctions.AddCategory(name="Income", income=1)
 dbfunctions.AddManyTrans(values=values)
 print(dbfunctions.GetTransByDateInterval(lowdate="2018-00-00",highdate="2019-00-00"))
