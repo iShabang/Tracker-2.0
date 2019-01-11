@@ -14,10 +14,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.move(centerScreen(self))
         self.buildMenu()
 
+        self.categories = dbfunctions.GetAllCategories()
+
         """Table Setup"""
         data = dbfunctions.GetTransByDateInterval(lowdate='2017-00-00', highdate='2019-00-00')
         headers = ["ID", "Name", "Date", "Price", "Category"]
-        categories = dbfunctions.GetAllCategories()
         mainTable = QtWidgets.QTableView()
         tableModel = models.tableModel(data=data, headers=headers)
         proxyModel = QtCore.QSortFilterProxyModel()
@@ -88,9 +89,8 @@ class MainWindow(QtWidgets.QMainWindow):
         edit_amount.setValidator(check_float)
         edit_amount.setPlaceholderText('Price')
         comboBox_category = QtWidgets.QComboBox()
-        comboBox_category.addItem('Category 1')
-        comboBox_category.addItem('Category 2')
-        comboBox_category.addItem('Category 3')
+        for row in self.categories:
+            comboBox_category.addItem(row[1])
         edit_date = DatePopup()
         addButton = QtWidgets.QPushButton('Submit', addWindow)
 
