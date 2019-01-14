@@ -17,7 +17,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.categories = dbfunctions.GetAllCategories()
 
         """Table Setup"""
-        data = dbfunctions.GetTransByDateInterval(lowdate='2017-00-00', highdate='2019-00-00')
+        data = dbfunctions.GetTransByDateInterval(lowdate='2017-00-00', highdate='2020-00-00')
         headers = ["ID", "Name", "Date", "Price", "Category"]
         mainTable = QtWidgets.QTableView()
         tableModel = models.tableModel(data=data, headers=headers)
@@ -26,6 +26,7 @@ class MainWindow(QtWidgets.QMainWindow):
         mainTable.setModel(proxyModel)
         stretchTableHeaders(mainTable, 5)
         mainTable.setSortingEnabled(True)
+        mainTable.sortByColumn(0, QtCore.Qt.AscendingOrder)
 
         """Info Labels Setup"""
         incomeCategory = findIncomeCategory()
