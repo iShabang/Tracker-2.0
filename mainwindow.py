@@ -174,7 +174,7 @@ def getColumnSpent(data, column, incomeCategoryList):
     for row in data:
         for i in incomeCategoryList:
             if row[4] != i:
-                    spentList.append(row[column])
+                    spentList.append(float(row[column]))
     return spentList
 
 def getColumnEarned(data, column, incomeCategoryList):
@@ -182,7 +182,7 @@ def getColumnEarned(data, column, incomeCategoryList):
     for row in data:
         for i in incomeCategoryList:
             if row[4] == i:
-                earnedList.append(row[column])
+                earnedList.append(float(row[column]))
     return earnedList
 
 def findIncomeCategory():
