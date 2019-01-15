@@ -15,6 +15,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.buildMenu()
 
         self.categories = dbfunctions.GetAllCategories()
+        self.__categoriesDict = {}
+        for row in self.categories:
+            self.__categoriesDict[row[1]] = row[0]
 
         """Table Setup"""
         data = dbfunctions.GetTransByDateInterval(lowdate='2017-00-00', highdate='2020-00-00')
@@ -100,9 +103,9 @@ class MainWindow(QtWidgets.QMainWindow):
             date = edit_date.text()
             amount = edit_amount.text()
             category = comboBox_category.currentText()
-            data = [name,date,float(amount),1]
+            data = [name,date,float(amount), self.__categoriesDict[category]]
             print(data)
-            dbfunctions.AddTrans(values=(name,date,amount,1))
+            dbfunctions.AddTrans(values=data)
             addWindow.close()
 
         addButton.clicked.connect(submit)
