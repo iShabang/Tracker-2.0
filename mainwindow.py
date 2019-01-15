@@ -1,4 +1,5 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
+from decimal import getcontext, Decimal
 
 import dbfunctions
 import models
@@ -174,7 +175,7 @@ def getColumnSpent(data, column, incomeCategoryList):
     for row in data:
         for i in incomeCategoryList:
             if row[4] != i:
-                    spentList.append(float(row[column]))
+                    spentList.append(Decimal(row[column]).quantize(Decimal('0.01')))
     return spentList
 
 def getColumnEarned(data, column, incomeCategoryList):
@@ -182,7 +183,7 @@ def getColumnEarned(data, column, incomeCategoryList):
     for row in data:
         for i in incomeCategoryList:
             if row[4] == i:
-                earnedList.append(float(row[column]))
+                earnedList.append(Decimal(row[column]).quantize(Decimal('0.01')))
     return earnedList
 
 def findIncomeCategory():
