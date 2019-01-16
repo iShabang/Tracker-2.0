@@ -44,11 +44,19 @@ class MainWindow(QtWidgets.QMainWindow):
         label_totalEarnedValue = QtWidgets.QLabel(str(amountEarned))
         label_totalSavedValue = QtWidgets.QLabel(str(amountSaved))
 
+        """Filter Section"""
+        comboBox_filter = QtWidgets.QComboBox()
+        for header in headers:
+            comboBox_filter.addItem(header)
+        edit_filter = QtWidgets.QLineEdit()
+        edit_filter.setPlaceholderText('Enter Text')
+
         """Buttons"""
         button_add = QtWidgets.QPushButton('Add Transaction', self)
         button_add.clicked.connect(self.openAddDialog)
         button_addCategory = QtWidgets.QPushButton('Add Category', self)
         button_addCategory.clicked.connect(self.openAddCatDialog)
+        button_filter = QtWidgets.QPushButton('Filter', self)
 
         """Top Grid"""
         grid_insert = QtWidgets.QGridLayout()
@@ -60,7 +68,11 @@ class MainWindow(QtWidgets.QMainWindow):
         grid_insert.addWidget(label_totalSpentValue,0,1)
         grid_insert.addWidget(label_totalEarnedValue,1,1)
         grid_insert.addWidget(label_totalSavedValue,2,1)
-        grid_insert.setColumnStretch(2,1)
+        grid_insert.addWidget(comboBox_filter,3,2)
+        grid_insert.addWidget(edit_filter,3,3)
+        grid_insert.addWidget(button_filter,3,4)
+        grid_insert.setColumnStretch(3,1)
+        grid_insert.setColumnStretch(4,1)
 
         """Main Layout"""
         mainvbox = QtWidgets.QVBoxLayout()
