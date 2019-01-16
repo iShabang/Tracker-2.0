@@ -49,6 +49,7 @@ values = [("chipotle", "2018-11-06", 8, 1),
           ("Chewy Boba", "2017-09-27", 4.60, 1),
           ("Walmart", "2017-09-27", 1.48, 1),
           ("Overwatch", "2017-09-29", 30.00, 2),
+          ("Check", "2017-09-29", 500.00, 3),
           ("Chipotle", "2017-09-29", 7.52, 1)]
 
 dbfunctions.AddCategory(name="Food", income=0)
