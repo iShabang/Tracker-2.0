@@ -16,13 +16,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.buildMenu()
 
         self.categories = dbfunctions.GetAllCategories()
-        self.__categoriesDict = {}
+        self._categoriesDict = {}
         for row in self.categories:
-            self.__categoriesDict[row[1]] = row[0]
+            self._categoriesDict[row[1]] = row[0]
+        headers = ["ID", "Name", "Date", "Price", "Category"]
+        self._headersDict = dict(zip(headers,range(len(headers))))    
 
         """Table Setup"""
         data = dbfunctions.GetTransByDateInterval(lowdate='2017-00-00', highdate='2020-00-00')
-        headers = ["ID", "Name", "Date", "Price", "Category"]
         mainTable = QtWidgets.QTableView()
         tableModel = models.tableModel(data=data, headers=headers)
         proxyModel = QtCore.QSortFilterProxyModel()
@@ -30,6 +31,7 @@ class MainWindow(QtWidgets.QMainWindow):
         mainTable.setModel(proxyModel)
         stretchTableHeaders(mainTable, 5)
         mainTable.setSortingEnabled(True)
+        proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
         mainTable.sortByColumn(0, QtCore.Qt.AscendingOrder)
 
         """Info Labels Setup"""
@@ -51,12 +53,17 @@ class MainWindow(QtWidgets.QMainWindow):
         edit_filter = QtWidgets.QLineEdit()
         edit_filter.setPlaceholderText('Enter Text')
 
+        def filterTable():
+            proxyModel.setFilterKeyColumn(self._headersDict[comboBox_filter.currentText()])
+            proxyModel.setFilterRegExp(edit_filter.text())
+
+        edit_filter.textChanged.connect(filterTable)
+
         """Buttons"""
         button_add = QtWidgets.QPushButton('Add Transaction', self)
         button_add.clicked.connect(self.openAddDialog)
         button_addCategory = QtWidgets.QPushButton('Add Category', self)
         button_addCategory.clicked.connect(self.openAddCatDialog)
-        button_filter = QtWidgets.QPushButton('Filter', self)
 
         """Top Grid"""
         grid_insert = QtWidgets.QGridLayout()
@@ -70,7 +77,6 @@ class MainWindow(QtWidgets.QMainWindow):
         grid_insert.addWidget(label_totalSavedValue,2,1)
         grid_insert.addWidget(comboBox_filter,3,2)
         grid_insert.addWidget(edit_filter,3,3)
-        grid_insert.addWidget(button_filter,3,4)
         grid_insert.setColumnStretch(3,1)
         grid_insert.setColumnStretch(4,1)
 
@@ -116,7 +122,7 @@ class MainWindow(QtWidgets.QMainWindow):
             date = edit_date.text()
             amount = edit_amount.text()
             category = comboBox_category.currentText()
-            data = [name,date,float(amount), self.__categoriesDict[category]]
+            data = [name,date,float(amount), self._categoriesDict[category]]
             print(data)
             dbfunctions.AddTrans(values=data)
             addWindow.close()
