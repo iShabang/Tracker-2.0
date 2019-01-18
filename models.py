@@ -35,6 +35,8 @@ class tableModel(QtCore.QAbstractTableModel):
         if role == QtCore.Qt.DisplayRole:
             if orientation == QtCore.Qt.Horizontal:
                 return self.__headers[section]
+            if orientation == QtCore.Qt.Vertical:
+                return "  "
 
 
 if __name__ == "__main__":
