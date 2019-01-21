@@ -31,6 +31,11 @@ class tableModel(QtCore.QAbstractTableModel):
 
         return True
 
+    def removeRows():
+        self.beginRemoveRows() 
+
+        self.endRemoveRows()
+
     def headerData(self, section, orientation, role):
         if role == QtCore.Qt.DisplayRole:
             if orientation == QtCore.Qt.Horizontal:
