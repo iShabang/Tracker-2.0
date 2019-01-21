@@ -59,11 +59,18 @@ class MainWindow(QtWidgets.QMainWindow):
 
         edit_filter.textChanged.connect(filterTable)
 
+        def delete():
+            dbfunctions.DelTrans(id_num=3)
+            tableModel.removeRows(row=0,count=1)
+
+
         """Buttons"""
         button_add = QtWidgets.QPushButton('Add Transaction', self)
         button_add.clicked.connect(self.openAddDialog)
         button_addCategory = QtWidgets.QPushButton('Add Category', self)
         button_addCategory.clicked.connect(self.openAddCatDialog)
+        button_del = QtWidgets.QPushButton('Delete', self)
+        button_del.clicked.connect(delete)
 
         """Top Grid"""
         grid_insert = QtWidgets.QGridLayout()
@@ -77,6 +84,7 @@ class MainWindow(QtWidgets.QMainWindow):
         grid_insert.addWidget(label_totalSavedValue,2,1)
         grid_insert.addWidget(comboBox_filter,3,2)
         grid_insert.addWidget(edit_filter,3,3)
+        grid_insert.addWidget(button_del,3,4)
         grid_insert.setColumnStretch(3,1)
         grid_insert.setColumnStretch(4,1)
 
@@ -123,7 +131,6 @@ class MainWindow(QtWidgets.QMainWindow):
             amount = edit_amount.text()
             category = comboBox_category.currentText()
             data = [name,date,float(amount), self._categoriesDict[category]]
-            print(data)
             dbfunctions.AddTrans(values=data)
             addWindow.close()
 
