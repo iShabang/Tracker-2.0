@@ -60,7 +60,6 @@ class MainWindow(QtWidgets.QMainWindow):
         edit_filter.textChanged.connect(filterTable)
 
         def delete():
-            dbfunctions.DelTrans(id_num=3)
             tableModel.removeRows(row=0,count=1)
 
 
