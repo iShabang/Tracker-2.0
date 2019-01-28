@@ -35,6 +35,7 @@ class tableModel(QtCore.QAbstractTableModel):
         self.beginRemoveRows(parent, row, row + count - 1) 
 
         for i in range(count):
+            print('deleting row {}'.format([row]))
             dbfunctions.DelTrans(id_num=self.__data[row][0])
             del self.__data[row]
 

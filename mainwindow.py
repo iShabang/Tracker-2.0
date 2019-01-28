@@ -60,7 +60,16 @@ class MainWindow(QtWidgets.QMainWindow):
         edit_filter.textChanged.connect(filterTable)
 
         def delete():
-            tableModel.removeRows(row=0,count=1)
+            selectedRows = mainTable.selectionModel().selectedRows()
+            indices = []
+            for i in selectedRows:
+                indices.append(i.row())
+            indices.sort()
+            difference = 0
+            for index in indices:
+                row = index-difference
+                tableModel.removeRows(row=row,count=1)
+                difference += 1
 
 
         """Buttons"""
