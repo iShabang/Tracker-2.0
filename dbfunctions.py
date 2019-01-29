@@ -94,13 +94,3 @@ def GetAllCategories(cursor):
     SELECT cat_id, name, income
     FROM category""")
     return cursor.fetchall()
-
-def DateSearchString(year, month, day):
-    search_string = "{}-{}-{}".format(year, month, day)
-    return search_string
-
-def NameSearchString(name):
-    search_string="%{}%".format(name)
-    return search_string
-    
-

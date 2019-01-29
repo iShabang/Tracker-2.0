@@ -31,10 +31,16 @@ class tableModel(QtCore.QAbstractTableModel):
 
         return True
 
-    def removeRows():
-        self.beginRemoveRows() 
+    def removeRows(self, row, count, parent = QtCore.QModelIndex()):
+        self.beginRemoveRows(parent, row, row + count - 1) 
+
+        for i in range(count):
+            print('deleting row {}'.format([row]))
+            dbfunctions.DelTrans(id_num=self.__data[row][0])
+            del self.__data[row]
 
         self.endRemoveRows()
+        return True
 
     def headerData(self, section, orientation, role):
         if role == QtCore.Qt.DisplayRole:
