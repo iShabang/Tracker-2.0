@@ -3,6 +3,7 @@ from decimal import getcontext, Decimal
 
 import dbfunctions
 import models
+import uitools
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -12,7 +13,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def initUI(self):
         self.setWindowTitle("Full Test Application")
         self.setGeometry(10,10,600,400)
-        self.move(centerScreen(self))
+        self.centerScreen()
         self.buildMenu()
 
         self.categories = dbfunctions.GetAllCategories()
@@ -29,15 +30,15 @@ class MainWindow(QtWidgets.QMainWindow):
         proxyModel = QtCore.QSortFilterProxyModel()
         proxyModel.setSourceModel(tableModel)
         mainTable.setModel(proxyModel)
-        stretchTableHeaders(mainTable, 5)
+        self.stretchTableHeaders(mainTable, 5)
         mainTable.setSortingEnabled(True)
         proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
         mainTable.sortByColumn(0, QtCore.Qt.AscendingOrder)
 
         """Info Labels Setup"""
-        incomeCategory = findIncomeCategory()
-        amountSpent = sum(getColumnSpent(data, 3, incomeCategory))
-        amountEarned = sum(getColumnEarned(data, 3, incomeCategory))
+        incomeCategory = uitools.findIncomeCategory()
+        amountSpent = sum(uitools.getColumnSpent(data, 3, incomeCategory))
+        amountEarned = sum(uitools.getColumnEarned(data, 3, incomeCategory))
         amountSaved = amountEarned - amountSpent
         label_totalSpent = QtWidgets.QLabel('Total Spent:')
         label_totalEarned = QtWidgets.QLabel('Total Earned:')
@@ -59,6 +60,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         edit_filter.textChanged.connect(filterTable)
 
+        """Delete Method"""
         def delete():
             selectedRows = mainTable.selectionModel().selectedRows()
             indices = []
@@ -104,6 +106,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.mainWidget.setLayout(mainvbox)
         self.setCentralWidget(self.mainWidget)
 
+    def centerScreen(self):
+        rectangle = self.frameGeometry()
+        centerPoint = QtWidgets.QDesktopWidget().availableGeometry().center()
+        rectangle.moveCenter(centerPoint)
+        self.move(rectangle.topLeft())
+
     def buildMenu(self):
         mainMenu = self.menuBar()
         fileMenu = mainMenu.addMenu('File')
@@ -114,8 +122,17 @@ class MainWindow(QtWidgets.QMainWindow):
         helpMenu = mainMenu.addMenu('Help')
         fileMenu.addAction('Test')
 
-    def calendarPopup():
-        calendar = QtWidgets.QCalendarWidget()
+    def DatePopup(self):
+        dateEdit = QtWidgets.QDateEdit()
+        dateEdit.setDate(QtCore.QDate.currentDate())
+        dateEdit.setCalendarPopup(True)
+        dateEdit.setDisplayFormat('yyyy-MM-dd')
+        return dateEdit
+    
+    def stretchTableHeaders(self, table, numColumns):
+        header = table.horizontalHeader()
+        for i in range(numColumns):
+            header.setSectionResizeMode(i, QtWidgets.QHeaderView.Stretch)
 
     def openAddDialog(self):
         addWindow = QtWidgets.QDialog()
@@ -130,7 +147,7 @@ class MainWindow(QtWidgets.QMainWindow):
         comboBox_category = QtWidgets.QComboBox()
         for row in self.categories:
             comboBox_category.addItem(row[1])
-        edit_date = DatePopup()
+        edit_date = self.DatePopup()
         addButton = QtWidgets.QPushButton('Submit', addWindow)
 
         def submit():
@@ -157,74 +174,21 @@ class MainWindow(QtWidgets.QMainWindow):
         addWindow.setWindowTitle("Adding Category")
         edit_category = QtWidgets.QLineEdit()
         edit_category.setPlaceholderText('Category')
+        checkBox_income = QtWidgets.QCheckBox('Income')
         addButton = QtWidgets.QPushButton('Submit', addWindow)
 
         def submit():
             category = edit_category.text()
-            print(category)
-            dbfunctions.AddCategory(name=(category))
+            income = 0
+            if checkBox_income.isChecked():
+                income = 1
+            dbfunctions.AddCategory(name=category, income=income)
             addWindow.close()
 
         addButton.clicked.connect(submit)
         mainlayout = QtWidgets.QVBoxLayout()
         mainlayout.addWidget(edit_category)
+        mainlayout.addWidget(checkBox_income)
         mainlayout.addWidget(addButton)
         addWindow.setLayout(mainlayout)
         addWindow.exec_()
-
-def DatePopup():
-    dateEdit = QtWidgets.QDateEdit()
-    dateEdit.setDate(QtCore.QDate.currentDate())
-    dateEdit.setCalendarPopup(True)
-    dateEdit.setDisplayFormat('yyyy-MM-dd')
-    return dateEdit
-
-def centerScreen(widget):
-    rectangle = widget.frameGeometry()
-    centerPoint = QtWidgets.QDesktopWidget().availableGeometry().center()
-    rectangle.moveCenter(centerPoint)
-    return rectangle.topLeft()
-
-def transactionTable(transactions):
-    table = QtWidgets.QTableWidget()
-    table.setRowCount(0)
-    table.setColumnCount(5)
-    table.setHorizontalHeaderLabels(["ID", "Name", "Date", "Price", "Category"])
-    stretchTableHeaders(table, 5)
-    for row_number, row_data in enumerate(transactions):
-        table.insertRow(row_number)
-        for column_number, column_data in enumerate(row_data):
-            table.setItem(row_number, column_number, QTableWidgetItem(str(column_data)))
-    table.setSortingEnabled(True)
-    return table
-
-def stretchTableHeaders(table, numColumns):
-    header = table.horizontalHeader()
-    for i in range(numColumns):
-        header.setSectionResizeMode(i, QtWidgets.QHeaderView.Stretch)
-
-def getColumnSpent(data, column, incomeCategoryList):
-    spentList = []
-    for row in data:
-        for i in incomeCategoryList:
-            if row[4] != i:
-                    spentList.append(Decimal(row[column]).quantize(Decimal('0.01')))
-    return spentList
-
-def getColumnEarned(data, column, incomeCategoryList):
-    earnedList = []
-    for row in data:
-        for i in incomeCategoryList:
-            if row[4] == i:
-                earnedList.append(Decimal(row[column]).quantize(Decimal('0.01')))
-    return earnedList
-
-def findIncomeCategory():
-    incomeCategoryList = []
-    categoryData = dbfunctions.GetAllCategories()
-    for row in categoryData:
-        if row[2] == 1:
-            incomeCategoryList.append(row[1])
-    return incomeCategoryList
-
-
