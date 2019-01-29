@@ -9,36 +9,42 @@ class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.initUI()
-      
-    def initUI(self):
+
+    def setupWindow(self):
         self.setWindowTitle("Full Test Application")
         self.setGeometry(10,10,600,400)
         self.centerScreen()
-        self.buildMenu()
 
+    def getProperties(self):
         self.categories = dbfunctions.GetAllCategories()
         self._categoriesDict = {}
         for row in self.categories:
             self._categoriesDict[row[1]] = row[0]
-        headers = ["ID", "Name", "Date", "Price", "Category"]
-        self._headersDict = dict(zip(headers,range(len(headers))))    
+        self.headers = ["ID", "Name", "Date", "Price", "Category"]
+        self._headersDict = dict(zip(self.headers,range(len(self.headers))))    
 
-        """Table Setup"""
-        data = dbfunctions.GetTransByDateInterval(lowdate='2017-00-00', highdate='2020-00-00')
-        mainTable = QtWidgets.QTableView()
-        tableModel = models.tableModel(data=data, headers=headers)
-        proxyModel = QtCore.QSortFilterProxyModel()
-        proxyModel.setSourceModel(tableModel)
-        mainTable.setModel(proxyModel)
-        self.stretchTableHeaders(mainTable, 5)
-        mainTable.setSortingEnabled(True)
-        proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
-        mainTable.sortByColumn(0, QtCore.Qt.AscendingOrder)
+    def buildTable(self):
+        self.data = dbfunctions.GetTransByDateInterval(lowdate='2017-00-00', highdate='2020-00-00')
+        self.mainTable = QtWidgets.QTableView()
+        self.tableModel = models.tableModel(data=self.data, headers=self.headers)
+        self.proxyModel = QtCore.QSortFilterProxyModel()
+        self.proxyModel.setSourceModel(self.tableModel)
+        self.mainTable.setModel(self.proxyModel)
+        self.stretchTableHeaders(self.mainTable, 5)
+        self.mainTable.setSortingEnabled(True)
+        self.proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
+        self.mainTable.sortByColumn(0, QtCore.Qt.AscendingOrder)
+      
+    def initUI(self):
+        self.setupWindow()
+        self.buildMenu()
+        self.getProperties()
+        self.buildTable()
 
         """Info Labels Setup"""
         incomeCategory = uitools.findIncomeCategory()
-        amountSpent = sum(uitools.getColumnSpent(data, 3, incomeCategory))
-        amountEarned = sum(uitools.getColumnEarned(data, 3, incomeCategory))
+        amountSpent = sum(uitools.getColumnSpent(self.data, 3, incomeCategory))
+        amountEarned = sum(uitools.getColumnEarned(self.data, 3, incomeCategory))
         amountSaved = amountEarned - amountSpent
         label_totalSpent = QtWidgets.QLabel('Total Spent:')
         label_totalEarned = QtWidgets.QLabel('Total Earned:')
@@ -49,20 +55,20 @@ class MainWindow(QtWidgets.QMainWindow):
 
         """Filter Section"""
         comboBox_filter = QtWidgets.QComboBox()
-        for header in headers:
+        for header in self.headers:
             comboBox_filter.addItem(header)
         edit_filter = QtWidgets.QLineEdit()
         edit_filter.setPlaceholderText('Enter Text')
 
         def filterTable():
-            proxyModel.setFilterKeyColumn(self._headersDict[comboBox_filter.currentText()])
-            proxyModel.setFilterRegExp(edit_filter.text())
+            self.proxyModel.setFilterKeyColumn(self._headersDict[comboBox_filter.currentText()])
+            self.proxyModel.setFilterRegExp(edit_filter.text())
 
         edit_filter.textChanged.connect(filterTable)
 
         """Delete Method"""
         def delete():
-            selectedRows = mainTable.selectionModel().selectedRows()
+            selectedRows = self.mainTable.selectionModel().selectedRows()
             indices = []
             for i in selectedRows:
                 indices.append(i.row())
@@ -70,7 +76,7 @@ class MainWindow(QtWidgets.QMainWindow):
             difference = 0
             for index in indices:
                 row = index-difference
-                tableModel.removeRows(row=row,count=1)
+                self.tableModel.removeRows(row=row,count=1)
                 difference += 1
 
 
@@ -101,10 +107,13 @@ class MainWindow(QtWidgets.QMainWindow):
         """Main Layout"""
         mainvbox = QtWidgets.QVBoxLayout()
         mainvbox.addLayout(grid_insert)
-        mainvbox.addWidget(mainTable)
+        mainvbox.addWidget(self.mainTable)
         self.mainWidget = QtWidgets.QWidget()
         self.mainWidget.setLayout(mainvbox)
         self.setCentralWidget(self.mainWidget)
+
+    #def refresh(self):
+        
 
     def centerScreen(self):
         rectangle = self.frameGeometry()
@@ -155,8 +164,8 @@ class MainWindow(QtWidgets.QMainWindow):
             date = edit_date.text()
             amount = edit_amount.text()
             category = comboBox_category.currentText()
-            data = [name,date,float(amount), self._categoriesDict[category]]
-            dbfunctions.AddTrans(values=data)
+            self.data = [name,date,float(amount), self._categoriesDict[category]]
+            dbfunctions.AddTrans(values=self.data)
             addWindow.close()
 
         addButton.clicked.connect(submit)
