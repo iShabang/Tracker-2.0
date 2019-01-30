@@ -2,6 +2,22 @@ from PyQt5 import QtCore, QtWidgets, QtGui
 import dbfunctions
 
 
+class listModel(QtCore.QAbstractListModel):
+    def __init__(self, data = [], parent = None):
+        QtCore.QAbstractListModel.__init__(self, parent)
+        self._data = data
+    
+    def rowCount(self, parent):
+        return len(self._data)
+
+    def data(self, index, role):
+
+        if role == QtCore.Qt.DisplayRole:
+            row = index.row()
+            value = self._data[row]
+            return value
+
+
 class tableModel(QtCore.QAbstractTableModel):
     def __init__(self, data = [[]], headers = [], parent = None):
         QtCore.QAbstractTableModel.__init__(self,parent)

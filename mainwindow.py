@@ -34,6 +34,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.mainTable.setSortingEnabled(True)
         self.proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
         self.mainTable.sortByColumn(0, QtCore.Qt.AscendingOrder)
+
+    def buildStatList(self, data):
+        self.statsData = []
+        self.statList = QtWidgets.QListView()
+        self.listModel = models.listModel(data = statsData)
+        self.statList.setModel(self.listModel)
+
       
     def initUI(self):
         self.setupWindow()
@@ -46,6 +53,7 @@ class MainWindow(QtWidgets.QMainWindow):
         amountSpent = sum(uitools.getColumnSpent(self.data, 3, incomeCategory))
         amountEarned = sum(uitools.getColumnEarned(self.data, 3, incomeCategory))
         amountSaved = amountEarned - amountSpent
+        buildStatList(data=[amountSpent,amountEarned,amountSaved])
         label_totalSpent = QtWidgets.QLabel('Total Spent:')
         label_totalEarned = QtWidgets.QLabel('Total Earned:')
         label_saved = QtWidgets.QLabel('Saved:')
@@ -187,6 +195,7 @@ class MainWindow(QtWidgets.QMainWindow):
         edit_category.setPlaceholderText('Category')
         checkBox_income = QtWidgets.QCheckBox('Income')
         addButton = QtWidgets.QPushButton('Submit', addWindow)
+        cancelButton = QtWidgets.QPushButton('Cancel', addWindow)
 
         def submit():
             category = edit_category.text()
@@ -197,9 +206,13 @@ class MainWindow(QtWidgets.QMainWindow):
             addWindow.close()
 
         addButton.clicked.connect(submit)
+        cancelButton.clicked.connect(addWindow.close)
         mainlayout = QtWidgets.QVBoxLayout()
+        buttonlayout = QtWidgets.QVBoxLayout()
+        buttonlayout.addWidget(addButton)
+        buttonlayout.addWidget(cancelButton)
         mainlayout.addWidget(edit_category)
         mainlayout.addWidget(checkBox_income)
-        mainlayout.addWidget(addButton)
+        mainlayout.addLayout(buttonlayout)
         addWindow.setLayout(mainlayout)
         addWindow.exec_()
