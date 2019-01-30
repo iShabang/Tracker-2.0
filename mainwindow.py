@@ -112,9 +112,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.mainWidget.setLayout(mainvbox)
         self.setCentralWidget(self.mainWidget)
 
-    #def refresh(self):
-        
-
     def centerScreen(self):
         rectangle = self.frameGeometry()
         centerPoint = QtWidgets.QDesktopWidget().availableGeometry().center()
@@ -158,6 +155,7 @@ class MainWindow(QtWidgets.QMainWindow):
             comboBox_category.addItem(row[1])
         edit_date = self.DatePopup()
         addButton = QtWidgets.QPushButton('Submit', addWindow)
+        cancelButton = QtWidgets.QPushButton('Cancel', addWindow)
 
         def submit():
             name = edit_name.text()
@@ -169,12 +167,16 @@ class MainWindow(QtWidgets.QMainWindow):
             addWindow.close()
 
         addButton.clicked.connect(submit)
+        cancelButton.clicked.connect(addWindow.close)
         mainlayout = QtWidgets.QVBoxLayout()
+        buttonlayout = QtWidgets.QHBoxLayout()
+        buttonlayout.addWidget(addButton)
+        buttonlayout.addWidget(cancelButton)
         mainlayout.addWidget(edit_name)
         mainlayout.addWidget(edit_amount)
         mainlayout.addWidget(comboBox_category)
         mainlayout.addWidget(edit_date)
-        mainlayout.addWidget(addButton)
+        mainlayout.addLayout(buttonlayout)
         addWindow.setLayout(mainlayout)
         addWindow.exec_()
         
