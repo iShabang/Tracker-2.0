@@ -80,18 +80,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.filterEdit.textChanged.connect(filterTable)
 
         """Delete Method"""
-        def delete():
-            selectedRows = self.mainTable.selectionModel().selectedRows()
-            indices = []
-            for i in selectedRows:
-                indices.append(i.row())
-            indices.sort()
-            difference = 0
-            for index in indices:
-                row = index-difference
-                self.tableModel.removeRows(row=row,count=1)
-                difference += 1
-
 
         """Buttons"""
         self.addTransBttn = QtWidgets.QPushButton('Add Transaction', self)
@@ -99,7 +87,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.addCatBttn = QtWidgets.QPushButton('Add Category', self)
         self.addCatBttn.clicked.connect(self.openAddCatDialog)
         button_del = QtWidgets.QPushButton('Delete Selected', self)
-        button_del.clicked.connect(delete)
+        button_del.clicked.connect(self.deleteRows)
 
         """Top Grid"""
         self.topGrid = QtWidgets.QGridLayout()
@@ -154,6 +142,18 @@ class MainWindow(QtWidgets.QMainWindow):
         header = table.horizontalHeader()
         for i in range(numColumns):
             header.setSectionResizeMode(i, QtWidgets.QHeaderView.Stretch)
+
+    def deleteRows(self):
+        selectedRows = self.mainTable.selectionModel().selectedRows()
+        indices = []
+        for i in selectedRows:
+            indices.append(i.row())
+        indices.sort()
+        difference = 0
+        for index in indices:
+            row = index-difference
+            self.tableModel.removeRows(row=row,count=1)
+            difference += 1
 
     def openAddDialog(self):
         addWindow = QtWidgets.QDialog()
