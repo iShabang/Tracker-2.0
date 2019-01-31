@@ -36,9 +36,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.mainTable.sortByColumn(0, QtCore.Qt.AscendingOrder)
 
     def buildStatList(self, data):
-        self.statsData = []
         self.statList = QtWidgets.QListView()
-        self.listModel = models.listModel(data = statsData)
+        self.listModel = models.listModel(data = data)
         self.statList.setModel(self.listModel)
 
       
@@ -53,7 +52,7 @@ class MainWindow(QtWidgets.QMainWindow):
         amountSpent = sum(uitools.getColumnSpent(self.data, 3, incomeCategory))
         amountEarned = sum(uitools.getColumnEarned(self.data, 3, incomeCategory))
         amountSaved = amountEarned - amountSpent
-        buildStatList(data=[amountSpent,amountEarned,amountSaved])
+        self.buildStatList(data=[amountSpent,amountEarned,amountSaved])
         label_totalSpent = QtWidgets.QLabel('Total Spent:')
         label_totalEarned = QtWidgets.QLabel('Total Earned:')
         label_saved = QtWidgets.QLabel('Saved:')
