@@ -37,7 +37,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def buildStatList(self, data):
         self.statList = QtWidgets.QListView()
-        self.listModel = models.listModel(data = data)
+        self.listModel = models.listModel(data=data)
         self.statList.setModel(self.listModel)
 
       
@@ -46,17 +46,22 @@ class MainWindow(QtWidgets.QMainWindow):
         self.buildMenu()
         self.getProperties()
         self.buildTable()
+        self._mapper = QtWidgets.QDataWidgetMapper()
 
         """Info Labels Setup"""
         incomeCategory = uitools.findIncomeCategory()
         amountSpent = sum(uitools.getColumnSpent(self.data, 3, incomeCategory))
         amountEarned = sum(uitools.getColumnEarned(self.data, 3, incomeCategory))
         amountSaved = amountEarned - amountSpent
-        self.buildStatList(data=[amountSpent,amountEarned,amountSaved])
+        self.label_totalSpentValue = QtWidgets.QLabel()
+        self.buildStatList(data=[str(amountSpent),str(amountEarned),str(amountSaved)])
+        self._mapper.setModel(self.listModel)
+        self._mapper.addMapping(self.label_totalSpentValue, 0)
+        self._mapper.toFirst()
         label_totalSpent = QtWidgets.QLabel('Total Spent:')
         label_totalEarned = QtWidgets.QLabel('Total Earned:')
         label_saved = QtWidgets.QLabel('Saved:')
-        label_totalSpentValue = QtWidgets.QLabel(str(amountSpent))
+        #label_totalSpentValue = QtWidgets.QLabel()
         label_totalEarnedValue = QtWidgets.QLabel(str(amountEarned))
         label_totalSavedValue = QtWidgets.QLabel(str(amountSaved))
 
@@ -102,7 +107,7 @@ class MainWindow(QtWidgets.QMainWindow):
         grid_insert.addWidget(label_saved,2,0)
         grid_insert.addWidget(button_add,3,0)
         grid_insert.addWidget(button_addCategory,3,1)
-        grid_insert.addWidget(label_totalSpentValue,0,1)
+        grid_insert.addWidget(self.label_totalSpentValue,0,1)
         grid_insert.addWidget(label_totalEarnedValue,1,1)
         grid_insert.addWidget(label_totalSavedValue,2,1)
         grid_insert.addWidget(comboBox_filter,3,2)

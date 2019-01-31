@@ -12,7 +12,8 @@ class listModel(QtCore.QAbstractListModel):
 
     def data(self, index, role):
 
-        if role == QtCore.Qt.DisplayRole:
+        if role == QtCore.Qt.DisplayRole or QtCore.Qt.EditRole:
+            print(self._data)
             row = index.row()
             value = self._data[row]
             return value
