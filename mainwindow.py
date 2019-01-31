@@ -36,7 +36,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.mainTable.sortByColumn(0, QtCore.Qt.AscendingOrder)
 
     def buildStatList(self, data):
-        self.statList = QtWidgets.QListView()
+        self.statList = QtWidgets.QTableView()
         self.listModel = models.listModel(data=data)
         self.statList.setModel(self.listModel)
 
@@ -50,20 +50,21 @@ class MainWindow(QtWidgets.QMainWindow):
 
         """Info Labels Setup"""
         incomeCategory = uitools.findIncomeCategory()
-        amountSpent = sum(uitools.getColumnSpent(self.data, 3, incomeCategory))
-        amountEarned = sum(uitools.getColumnEarned(self.data, 3, incomeCategory))
-        amountSaved = amountEarned - amountSpent
-        self.label_totalSpentValue = QtWidgets.QLabel()
-        self.buildStatList(data=[str(amountSpent),str(amountEarned),str(amountSaved)])
+        self.amountSpent = sum(uitools.getColumnSpent(self.data, 3, incomeCategory))
+        self.amountEarned = sum(uitools.getColumnEarned(self.data, 3, incomeCategory))
+        self.amountSaved = self.amountEarned - self.amountSpent
+        self.buildStatList(data=[[str(self.amountSpent),str(self.amountEarned),str(self.amountSaved)]])
+        self.spentLabel = QtWidgets.QLabel('Spent:')
+        self.earnedLabel = QtWidgets.QLabel('Earned:')
+        self.savedLabel = QtWidgets.QLabel('Saved:')
+        self.spentEdit = QtWidgets.QLineEdit()
+        self.earnedEdit = QtWidgets.QLineEdit()
+        self.savedEdit = QtWidgets.QLineEdit()
         self._mapper.setModel(self.listModel)
-        self._mapper.addMapping(self.label_totalSpentValue, 0)
+        self._mapper.addMapping(self.spentEdit, 0)
+        self._mapper.addMapping(self.earnedEdit, 1)
+        self._mapper.addMapping(self.savedEdit, 2)
         self._mapper.toFirst()
-        label_totalSpent = QtWidgets.QLabel('Total Spent:')
-        label_totalEarned = QtWidgets.QLabel('Total Earned:')
-        label_saved = QtWidgets.QLabel('Saved:')
-        #label_totalSpentValue = QtWidgets.QLabel()
-        label_totalEarnedValue = QtWidgets.QLabel(str(amountEarned))
-        label_totalSavedValue = QtWidgets.QLabel(str(amountSaved))
 
         """Filter Section"""
         comboBox_filter = QtWidgets.QComboBox()
@@ -97,19 +98,19 @@ class MainWindow(QtWidgets.QMainWindow):
         button_add.clicked.connect(self.openAddDialog)
         button_addCategory = QtWidgets.QPushButton('Add Category', self)
         button_addCategory.clicked.connect(self.openAddCatDialog)
-        button_del = QtWidgets.QPushButton('Delete', self)
+        button_del = QtWidgets.QPushButton('Delete Selected', self)
         button_del.clicked.connect(delete)
 
         """Top Grid"""
         grid_insert = QtWidgets.QGridLayout()
-        grid_insert.addWidget(label_totalSpent,0,0)
-        grid_insert.addWidget(label_totalEarned,1,0)
-        grid_insert.addWidget(label_saved,2,0)
+        grid_insert.addWidget(self.spentLabel,0,0)
+        grid_insert.addWidget(self.earnedLabel,1,0)
+        grid_insert.addWidget(self.savedLabel,2,0)
         grid_insert.addWidget(button_add,3,0)
         grid_insert.addWidget(button_addCategory,3,1)
-        grid_insert.addWidget(self.label_totalSpentValue,0,1)
-        grid_insert.addWidget(label_totalEarnedValue,1,1)
-        grid_insert.addWidget(label_totalSavedValue,2,1)
+        grid_insert.addWidget(self.spentEdit,0,1)
+        grid_insert.addWidget(self.earnedEdit,1,1)
+        grid_insert.addWidget(self.savedEdit,2,1)
         grid_insert.addWidget(comboBox_filter,3,2)
         grid_insert.addWidget(edit_filter,3,3)
         grid_insert.addWidget(button_del,3,4)
