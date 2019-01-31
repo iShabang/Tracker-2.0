@@ -67,17 +67,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self._mapper.toFirst()
 
         """Filter Section"""
-        comboBox_filter = QtWidgets.QComboBox()
+        self.filterComboBox = QtWidgets.QComboBox()
         for header in self.headers:
-            comboBox_filter.addItem(header)
-        edit_filter = QtWidgets.QLineEdit()
-        edit_filter.setPlaceholderText('Enter Text')
+            self.filterComboBox.addItem(header)
+        self.filterEdit = QtWidgets.QLineEdit()
+        self.filterEdit.setPlaceholderText('Enter Text')
 
         def filterTable():
-            self.proxyModel.setFilterKeyColumn(self._headersDict[comboBox_filter.currentText()])
-            self.proxyModel.setFilterRegExp(edit_filter.text())
+            self.proxyModel.setFilterKeyColumn(self._headersDict[self.filterComboBox.currentText()])
+            self.proxyModel.setFilterRegExp(self.filterEdit.text())
 
-        edit_filter.textChanged.connect(filterTable)
+        self.filterEdit.textChanged.connect(filterTable)
 
         """Delete Method"""
         def delete():
@@ -94,36 +94,36 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
         """Buttons"""
-        button_add = QtWidgets.QPushButton('Add Transaction', self)
-        button_add.clicked.connect(self.openAddDialog)
-        button_addCategory = QtWidgets.QPushButton('Add Category', self)
-        button_addCategory.clicked.connect(self.openAddCatDialog)
+        self.addTransBttn = QtWidgets.QPushButton('Add Transaction', self)
+        self.addTransBttn.clicked.connect(self.openAddDialog)
+        self.addCatBttn = QtWidgets.QPushButton('Add Category', self)
+        self.addCatBttn.clicked.connect(self.openAddCatDialog)
         button_del = QtWidgets.QPushButton('Delete Selected', self)
         button_del.clicked.connect(delete)
 
         """Top Grid"""
-        grid_insert = QtWidgets.QGridLayout()
-        grid_insert.addWidget(self.spentLabel,0,0)
-        grid_insert.addWidget(self.earnedLabel,1,0)
-        grid_insert.addWidget(self.savedLabel,2,0)
-        grid_insert.addWidget(button_add,3,0)
-        grid_insert.addWidget(button_addCategory,3,1)
-        grid_insert.addWidget(self.spentEdit,0,1)
-        grid_insert.addWidget(self.earnedEdit,1,1)
-        grid_insert.addWidget(self.savedEdit,2,1)
-        grid_insert.addWidget(comboBox_filter,3,2)
-        grid_insert.addWidget(edit_filter,3,3)
-        grid_insert.addWidget(button_del,3,4)
-        grid_insert.setColumnStretch(3,1)
-        grid_insert.setColumnStretch(4,1)
+        self.topGrid = QtWidgets.QGridLayout()
+        self.topGrid.addWidget(self.spentLabel,0,0)
+        self.topGrid.addWidget(self.earnedLabel,1,0)
+        self.topGrid.addWidget(self.savedLabel,2,0)
+        self.topGrid.addWidget(self.addTransBttn,3,0)
+        self.topGrid.addWidget(self.addCatBttn,3,1)
+        self.topGrid.addWidget(self.spentEdit,0,1)
+        self.topGrid.addWidget(self.earnedEdit,1,1)
+        self.topGrid.addWidget(self.savedEdit,2,1)
+        self.topGrid.addWidget(self.filterComboBox,3,2)
+        self.topGrid.addWidget(self.filterEdit,3,3)
+        self.topGrid.addWidget(button_del,3,4)
+        self.topGrid.setColumnStretch(3,1)
+        self.topGrid.setColumnStretch(4,1)
 
         """Main Layout"""
-        mainvbox = QtWidgets.QVBoxLayout()
-        mainvbox.addLayout(grid_insert)
-        mainvbox.addWidget(self.mainTable)
-        self.mainWidget = QtWidgets.QWidget()
-        self.mainWidget.setLayout(mainvbox)
-        self.setCentralWidget(self.mainWidget)
+        self._mainvbox = QtWidgets.QVBoxLayout()
+        self._mainvbox.addLayout(self.topGrid)
+        self._mainvbox.addWidget(self.mainTable)
+        self._mainWidget = QtWidgets.QWidget()
+        self._mainWidget.setLayout(self._mainvbox)
+        self.setCentralWidget(self._mainWidget)
 
     def centerScreen(self):
         rectangle = self.frameGeometry()
@@ -132,14 +132,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.move(rectangle.topLeft())
 
     def buildMenu(self):
-        mainMenu = self.menuBar()
-        fileMenu = mainMenu.addMenu('File')
-        editMenu = mainMenu.addMenu('Edit')
-        viewMenu = mainMenu.addMenu('View')
-        searchMenu = mainMenu.addMenu('Search')
-        toolsMenu = mainMenu.addMenu('Tools')
-        helpMenu = mainMenu.addMenu('Help')
-        fileMenu.addAction('Test')
+        self.mainMenu = self.menuBar()
+        self.fileMenu = self.mainMenu.addMenu('File')
+        self.fileMenu.addAction('Print')
+        self.editMenu = self.mainMenu.addMenu('Edit')
+        self.editMenu.addAction('Copy')
+        self.editMenu.addAction('Delete')
+        self.reportMenu = self.mainMenu.addMenu('Report')
+        self.reportMenu.addAction('Week')
+        self.reportMenu.addAction('Month')
+        self.reportMenu.addAction('Year')
 
     def DatePopup(self):
         dateEdit = QtWidgets.QDateEdit()
