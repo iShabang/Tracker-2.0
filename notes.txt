@@ -1,4 +1,6 @@
 2. Design a refresh feature to reflect new changes.
+2.1. rearrange the layout on the top.
+2.3. use the same table model to hold the totals and transactions together.
 
 3. Figure out what do to when deleting a category
     idea: ask user if they want to delete all items in that category. If yes, then 
