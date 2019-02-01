@@ -2,7 +2,7 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 from decimal import getcontext, Decimal
 import datetime
 
-import dbfunctions
+import dbfunctions as db
 import models
 import uitools
 
@@ -17,7 +17,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.centerScreen()
 
     def getProperties(self):
-        self.categories = dbfunctions.GetAllCategories()
+        self.categories = db.GetAllCategories()
         self._categoriesDict = {}
         for row in self.categories:
             self._categoriesDict[row[1]] = row[0]
@@ -26,7 +26,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def buildTable(self):
         self.mainTable = QtWidgets.QTableView()
-        self.tableModel = models.tableModel(data=self.transactions, headers=self.headers)
+        self.tableModel = models.tableModel(data=self.trans, headers=self.headers)
         self.proxyModel = QtCore.QSortFilterProxyModel()
         self.proxyModel.setSourceModel(self.tableModel)
         self.mainTable.setModel(self.proxyModel)
@@ -40,19 +40,23 @@ class MainWindow(QtWidgets.QMainWindow):
         self.listModel = models.listModel(data=data)
         self.statList.setModel(self.listModel)
 
-    def setCurrentDateInterval(self, lowdate, highdate): 
-        self.currentDateInterval = (lowdate,highdate)
+    def setDateInterval(self, thisMonth = True, lowdate = None, highdate = None): 
+        if not thisMonth:
+            self.lowdate = lowdate
+            self.highdate = highdate
+        else:
+            self.lowdate = self.currentDate.toString("yyyy-MM-00")
+            self.highdate = self.currentDate.toString("yyyy-MM-dd")
 
     def getTransactions(self):
-        self.transactions = dbfunctions.GetTransByDateInterval(lowdate=self.currentDateInterval[0], highdate=self.currentDateInterval[1])
+        self.trans = db.getTransByDate(lowdate=self.lowdate, highdate=self.highdate)
       
     def initUI(self):
         self.setupWindow()
         self.setCurrentDate()
+        self.setDateInterval()
         self.buildMenu()
         self.getProperties()
-        self.setCurrentDateInterval("2019-01-00", self.currentDate.toString("yyyy-MM-dd"))
-        print(self.currentDate.toString("yyyy-MM-dd"))
         self.getTransactions()
         self.buildTable()
         self._mapper = QtWidgets.QDataWidgetMapper()
@@ -60,8 +64,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         """Info Labels Setup"""
         incomeCategory = uitools.findIncomeCategory()
-        self.amountSpent = sum(uitools.getColumnSpent(self.transactions, 3, incomeCategory))
-        self.amountEarned = sum(uitools.getColumnEarned(self.transactions, 3, incomeCategory))
+        self.amountSpent = sum(uitools.getColumnSpent(self.trans, 3, incomeCategory))
+        self.amountEarned = sum(uitools.getColumnEarned(self.trans, 3, incomeCategory))
         self.amountSaved = self.amountEarned - self.amountSpent
         self.buildStatList(data=[[str(self.amountSpent),str(self.amountEarned),str(self.amountSaved)]])
         self.spentLabel = QtWidgets.QLabel('Spent:')
@@ -191,7 +195,7 @@ class MainWindow(QtWidgets.QMainWindow):
             amount = edit_amount.text()
             category = comboBox_category.currentText()
             transaction = [name,date,float(amount), self._categoriesDict[category]]
-            dbfunctions.AddTrans(values=transaction)
+            db.AddTrans(values=transaction)
             addWindow.close()
 
         addButton.clicked.connect(submit)
@@ -222,7 +226,7 @@ class MainWindow(QtWidgets.QMainWindow):
             income = 0
             if checkBox_income.isChecked():
                 income = 1
-            dbfunctions.AddCategory(name=category, income=income)
+            db.AddCategory(name=category, income=income)
             addWindow.close()
 
         addButton.clicked.connect(submit)
