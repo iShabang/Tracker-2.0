@@ -24,9 +24,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.headers = ["ID", "Name", "Date", "Price", "Category"]
         self._headersDict = dict(zip(self.headers,range(len(self.headers))))    
 
-    def buildTable(self, data):
+    def buildTable(self):
         self.mainTable = QtWidgets.QTableView()
-        self.tableModel = models.tableModel(data=data, headers=self.headers)
+        self.tableModel = models.tableModel(data=self.transactions, headers=self.headers)
         self.proxyModel = QtCore.QSortFilterProxyModel()
         self.proxyModel.setSourceModel(self.tableModel)
         self.mainTable.setModel(self.proxyModel)
@@ -51,7 +51,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setCurrentDate()
         self.buildMenu()
         self.getProperties()
-        self.setCurrentDateInterval("2019-01-00", self.currentDate)
+        self.setCurrentDateInterval("2019-01-00", self.currentDate.toString("yyyy-MM-dd"))
+        print(self.currentDate.toString("yyyy-MM-dd"))
+        self.getTransactions()
         self.buildTable()
         self._mapper = QtWidgets.QDataWidgetMapper()
         self.setCurrentDate()
