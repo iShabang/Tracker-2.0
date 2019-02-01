@@ -35,7 +35,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
         self.mainTable.sortByColumn(0, QtCore.Qt.AscendingOrder)
 
-    def buildStatList(self, data):
+    def buildStatList(self, data = None):
+        if not data:
+            amountSpent = sum(uitools.getColumnSpent(self.trans, 3, self.incomeCategory))
+            amountEarned = sum(uitools.getColumnEarned(self.trans, 3, self.incomeCategory))
+            amountSaved = amountEarned - amountSpent
+            data = [[str(amountSpent),str(amountEarned),str(amountSaved)]]
         self.statList = QtWidgets.QTableView()
         self.listModel = models.listModel(data=data)
         self.statList.setModel(self.listModel)
@@ -60,14 +65,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.getTransactions()
         self.buildTable()
         self._mapper = QtWidgets.QDataWidgetMapper()
-        self.setCurrentDate()
 
         """Info Labels Setup"""
-        incomeCategory = uitools.findIncomeCategory()
-        self.amountSpent = sum(uitools.getColumnSpent(self.trans, 3, incomeCategory))
-        self.amountEarned = sum(uitools.getColumnEarned(self.trans, 3, incomeCategory))
-        self.amountSaved = self.amountEarned - self.amountSpent
-        self.buildStatList(data=[[str(self.amountSpent),str(self.amountEarned),str(self.amountSaved)]])
+        self.incomeCategory = uitools.findIncomeCategory()
+        self.buildStatList()
         self.spentLabel = QtWidgets.QLabel('Spent:')
         self.earnedLabel = QtWidgets.QLabel('Earned:')
         self.savedLabel = QtWidgets.QLabel('Saved:')
