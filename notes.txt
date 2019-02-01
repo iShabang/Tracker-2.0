@@ -1,6 +1,7 @@
 2. Design a refresh feature to reflect new changes.
 2.1. rearrange the layout on the top.
-2.3. use the same table model to hold the totals and transactions together.
+
+move uitools functions into MainWindow
 
 Add a Category screen displaying all the categories and their attributes. 
 
