@@ -1,5 +1,6 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 from decimal import getcontext, Decimal
+import datetime
 
 import dbfunctions
 import models
@@ -23,10 +24,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.headers = ["ID", "Name", "Date", "Price", "Category"]
         self._headersDict = dict(zip(self.headers,range(len(self.headers))))    
 
-    def buildTable(self):
-        self.data = dbfunctions.GetTransByDateInterval(lowdate='2017-00-00', highdate='2020-00-00')
+    def buildTable(self, data):
         self.mainTable = QtWidgets.QTableView()
-        self.tableModel = models.tableModel(data=self.data, headers=self.headers)
+        self.tableModel = models.tableModel(data=data, headers=self.headers)
         self.proxyModel = QtCore.QSortFilterProxyModel()
         self.proxyModel.setSourceModel(self.tableModel)
         self.mainTable.setModel(self.proxyModel)
@@ -40,18 +40,26 @@ class MainWindow(QtWidgets.QMainWindow):
         self.listModel = models.listModel(data=data)
         self.statList.setModel(self.listModel)
 
+    def setCurrentDateInterval(self, lowdate, highdate): 
+        self.currentDateInterval = (lowdate,highdate)
+
+    def getTransactions(self):
+        self.transactions = dbfunctions.GetTransByDateInterval(lowdate=self.currentDateInterval[0], highdate=self.currentDateInterval[1])
       
     def initUI(self):
         self.setupWindow()
+        self.setCurrentDate()
         self.buildMenu()
         self.getProperties()
+        self.setCurrentDateInterval("2019-01-00", self.currentDate)
         self.buildTable()
         self._mapper = QtWidgets.QDataWidgetMapper()
+        self.setCurrentDate()
 
         """Info Labels Setup"""
         incomeCategory = uitools.findIncomeCategory()
-        self.amountSpent = sum(uitools.getColumnSpent(self.data, 3, incomeCategory))
-        self.amountEarned = sum(uitools.getColumnEarned(self.data, 3, incomeCategory))
+        self.amountSpent = sum(uitools.getColumnSpent(self.transactions, 3, incomeCategory))
+        self.amountEarned = sum(uitools.getColumnEarned(self.transactions, 3, incomeCategory))
         self.amountSaved = self.amountEarned - self.amountSpent
         self.buildStatList(data=[[str(self.amountSpent),str(self.amountEarned),str(self.amountSaved)]])
         self.spentLabel = QtWidgets.QLabel('Spent:')
@@ -113,6 +121,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self._mainWidget.setLayout(self._mainvbox)
         self.setCentralWidget(self._mainWidget)
 
+    def setCurrentDate(self):
+        self.currentDate = QtCore.QDate.currentDate()
+
     def centerScreen(self):
         rectangle = self.frameGeometry()
         centerPoint = QtWidgets.QDesktopWidget().availableGeometry().center()
@@ -133,7 +144,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def DatePopup(self):
         dateEdit = QtWidgets.QDateEdit()
-        dateEdit.setDate(QtCore.QDate.currentDate())
+        dateEdit.setDate(self.currentDate)
         dateEdit.setCalendarPopup(True)
         dateEdit.setDisplayFormat('yyyy-MM-dd')
         return dateEdit
@@ -177,8 +188,8 @@ class MainWindow(QtWidgets.QMainWindow):
             date = edit_date.text()
             amount = edit_amount.text()
             category = comboBox_category.currentText()
-            self.data = [name,date,float(amount), self._categoriesDict[category]]
-            dbfunctions.AddTrans(values=self.data)
+            transaction = [name,date,float(amount), self._categoriesDict[category]]
+            dbfunctions.AddTrans(values=transaction)
             addWindow.close()
 
         addButton.clicked.connect(submit)

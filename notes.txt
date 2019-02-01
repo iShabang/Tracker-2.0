@@ -2,6 +2,10 @@
 2.1. rearrange the layout on the top.
 2.3. use the same table model to hold the totals and transactions together.
 
+Add a Category screen displaying all the categories and their attributes. 
+
+Fix sorting in the Price column
+
 3. Figure out what do to when deleting a category
     idea: ask user if they want to delete all items in that category. If yes, then 
     run a function that does so.
