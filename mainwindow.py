@@ -23,6 +23,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self._categoriesDict[row[1]] = row[0]
         self.headers = ["ID", "Name", "Date", "Price", "Category"]
         self._headersDict = dict(zip(self.headers,range(len(self.headers))))    
+        self.incomeCategory = uitools.findIncomeCategory()
 
     def buildTable(self):
         self.mainTable = QtWidgets.QTableView()
@@ -30,13 +31,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self.proxyModel = QtCore.QSortFilterProxyModel()
         self.proxyModel.setSourceModel(self.tableModel)
         self.mainTable.setModel(self.proxyModel)
-        self.stretchTableHeaders(self.mainTable, 5)
+        #self.stretchTableHeaders(self.mainTable, 5)
         self.mainTable.setSortingEnabled(True)
         self.proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
         self.mainTable.sortByColumn(0, QtCore.Qt.AscendingOrder)
 
-    def buildStatList(self, data = None):
-        if not data:
+    def buildStatList(self):
+        if self.isEmpty():
+            data = []
+        else:
             amountSpent = sum(uitools.getColumnSpent(self.trans, 3, self.incomeCategory))
             amountEarned = sum(uitools.getColumnEarned(self.trans, 3, self.incomeCategory))
             amountSaved = amountEarned - amountSpent
@@ -44,31 +47,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.statList = QtWidgets.QTableView()
         self.listModel = models.listModel(data=data)
         self.statList.setModel(self.listModel)
-
-    def setDateInterval(self, thisMonth = True, lowdate = None, highdate = None): 
-        if not thisMonth:
-            self.lowdate = lowdate
-            self.highdate = highdate
-        else:
-            self.lowdate = self.currentDate.toString("yyyy-MM-00")
-            self.highdate = self.currentDate.toString("yyyy-MM-dd")
-
-    def getTransactions(self):
-        self.trans = db.getTransByDate(lowdate=self.lowdate, highdate=self.highdate)
-      
-    def initUI(self):
-        self.setupWindow()
-        self.setCurrentDate()
-        self.setDateInterval()
-        self.buildMenu()
-        self.getProperties()
-        self.getTransactions()
-        self.buildTable()
-        self._mapper = QtWidgets.QDataWidgetMapper()
-
-        """Info Labels Setup"""
-        self.incomeCategory = uitools.findIncomeCategory()
-        self.buildStatList()
         self.spentLabel = QtWidgets.QLabel('Spent:')
         self.earnedLabel = QtWidgets.QLabel('Earned:')
         self.savedLabel = QtWidgets.QLabel('Saved:')
@@ -81,10 +59,41 @@ class MainWindow(QtWidgets.QMainWindow):
         self._mapper.addMapping(self.savedEdit, 2)
         self._mapper.toFirst()
 
-        """Filter Section"""
-        self.filterComboBox = QtWidgets.QComboBox()
+    def setDateInterval(self, thisMonth = True, lowdate = None, highdate = None): 
+        if not thisMonth:
+            self.lowdate = lowdate
+            self.highdate = highdate
+        else:
+            self.lowdate = self.currentDate.toString("yyyy-MM-00")
+            self.highdate = self.currentDate.toString("yyyy-MM-dd")
+
+    def getTransactions(self):
+        self.trans = db.getTransByDate(lowdate=self.lowdate, highdate=self.highdate)
+
+    def isEmpty(self):
+        if len(self.trans) == 0:
+            return True
+        return False
+
+    def headerComboBox(self):
+        comboBox = QtWidgets.QComboBox()
         for header in self.headers:
-            self.filterComboBox.addItem(header)
+            comboBox.addItem(header)
+        return comboBox
+
+    def initUI(self):
+        self.setupWindow()
+        self.setCurrentDate()
+        self.setDateInterval()
+        self.buildMenu()
+        self.getProperties()
+        self.getTransactions()
+        self._mapper = QtWidgets.QDataWidgetMapper()
+        self.buildTable()
+        self.buildStatList()
+
+        """Filter Section"""
+        self.filterComboBox = self.headerComboBox()
         self.filterEdit = QtWidgets.QLineEdit()
         self.filterEdit.setPlaceholderText('Enter Text')
 
@@ -93,8 +102,6 @@ class MainWindow(QtWidgets.QMainWindow):
             self.proxyModel.setFilterRegExp(self.filterEdit.text())
 
         self.filterEdit.textChanged.connect(filterTable)
-
-        """Delete Method"""
 
         """Buttons"""
         self.addTransBttn = QtWidgets.QPushButton('Add Transaction', self)
