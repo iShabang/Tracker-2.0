@@ -1,0 +1,21 @@
+2. Design a refresh feature to reflect new changes.
+2.1. rearrange the layout on the top.
+
+move uitools functions into MainWindow
+
+Add a Category screen displaying all the categories and their attributes. 
+
+Fix sorting in the Price column
+
+3. Figure out what do to when deleting a category
+    idea: ask user if they want to delete all items in that category. If yes, then 
+    run a function that does so.
+    Finally, delete the category
+
+3.1. Need a way to edit different cells. Will require sql to edit cells in the table
+
+4. Create the search feature to pull data from different time periods not shown on the home screen. 
+
+5. Add more calculations for spending, earnings, and savings.
+6. Build an expense report system for time periods such as year, month, week. 
+7. Begin working on the bills feature.

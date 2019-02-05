@@ -1,7 +1,8 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 from decimal import getcontext, Decimal
+import datetime
 
-import dbfunctions
+import dbfunctions as db
 import models
 import uitools
 
@@ -9,102 +10,133 @@ class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.initUI()
-      
-    def initUI(self):
+
+    def setupWindow(self):
         self.setWindowTitle("Full Test Application")
         self.setGeometry(10,10,600,400)
         self.centerScreen()
-        self.buildMenu()
 
-        self.categories = dbfunctions.GetAllCategories()
+    def getProperties(self):
+        self.categories = db.GetAllCategories()
         self._categoriesDict = {}
         for row in self.categories:
             self._categoriesDict[row[1]] = row[0]
-        headers = ["ID", "Name", "Date", "Price", "Category"]
-        self._headersDict = dict(zip(headers,range(len(headers))))    
+        self.headers = ["ID", "Name", "Date", "Price", "Category"]
+        self._headersDict = dict(zip(self.headers,range(len(self.headers))))    
+        self.incomeCategory = uitools.findIncomeCategory()
 
-        """Table Setup"""
-        data = dbfunctions.GetTransByDateInterval(lowdate='2017-00-00', highdate='2020-00-00')
-        mainTable = QtWidgets.QTableView()
-        tableModel = models.tableModel(data=data, headers=headers)
-        proxyModel = QtCore.QSortFilterProxyModel()
-        proxyModel.setSourceModel(tableModel)
-        mainTable.setModel(proxyModel)
-        self.stretchTableHeaders(mainTable, 5)
-        mainTable.setSortingEnabled(True)
-        proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
-        mainTable.sortByColumn(0, QtCore.Qt.AscendingOrder)
+    def buildTable(self):
+        self.mainTable = QtWidgets.QTableView()
+        self.tableModel = models.tableModel(data=self.trans, headers=self.headers)
+        self.proxyModel = QtCore.QSortFilterProxyModel()
+        self.proxyModel.setSourceModel(self.tableModel)
+        self.mainTable.setModel(self.proxyModel)
+        #self.stretchTableHeaders(self.mainTable, 5)
+        self.mainTable.setSortingEnabled(True)
+        self.proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
+        self.mainTable.sortByColumn(0, QtCore.Qt.AscendingOrder)
 
-        """Info Labels Setup"""
-        incomeCategory = uitools.findIncomeCategory()
-        amountSpent = sum(uitools.getColumnSpent(data, 3, incomeCategory))
-        amountEarned = sum(uitools.getColumnEarned(data, 3, incomeCategory))
-        amountSaved = amountEarned - amountSpent
-        label_totalSpent = QtWidgets.QLabel('Total Spent:')
-        label_totalEarned = QtWidgets.QLabel('Total Earned:')
-        label_saved = QtWidgets.QLabel('Saved:')
-        label_totalSpentValue = QtWidgets.QLabel(str(amountSpent))
-        label_totalEarnedValue = QtWidgets.QLabel(str(amountEarned))
-        label_totalSavedValue = QtWidgets.QLabel(str(amountSaved))
+    def buildStatList(self):
+        if self.isEmpty():
+            data = []
+        else:
+            amountSpent = sum(uitools.getColumnSpent(self.trans, 3, self.incomeCategory))
+            amountEarned = sum(uitools.getColumnEarned(self.trans, 3, self.incomeCategory))
+            amountSaved = amountEarned - amountSpent
+            data = [[str(amountSpent),str(amountEarned),str(amountSaved)]]
+        self.statList = QtWidgets.QTableView()
+        self.listModel = models.listModel(data=data)
+        self.statList.setModel(self.listModel)
+        self.spentLabel = QtWidgets.QLabel('Spent:')
+        self.earnedLabel = QtWidgets.QLabel('Earned:')
+        self.savedLabel = QtWidgets.QLabel('Saved:')
+        self.spentEdit = QtWidgets.QLineEdit()
+        self.earnedEdit = QtWidgets.QLineEdit()
+        self.savedEdit = QtWidgets.QLineEdit()
+        self._mapper.setModel(self.listModel)
+        self._mapper.addMapping(self.spentEdit, 0)
+        self._mapper.addMapping(self.earnedEdit, 1)
+        self._mapper.addMapping(self.savedEdit, 2)
+        self._mapper.toFirst()
+
+    def setDateInterval(self, thisMonth = True, lowdate = None, highdate = None): 
+        if not thisMonth:
+            self.lowdate = lowdate
+            self.highdate = highdate
+        else:
+            self.lowdate = self.currentDate.toString("yyyy-MM-00")
+            self.highdate = self.currentDate.toString("yyyy-MM-dd")
+
+    def getTransactions(self):
+        self.trans = db.getTransByDate(lowdate=self.lowdate, highdate=self.highdate)
+
+    def isEmpty(self):
+        if len(self.trans) == 0:
+            return True
+        return False
+
+    def headerComboBox(self):
+        comboBox = QtWidgets.QComboBox()
+        for header in self.headers:
+            comboBox.addItem(header)
+        return comboBox
+
+    def initUI(self):
+        self.setupWindow()
+        self.setCurrentDate()
+        self.setDateInterval()
+        self.buildMenu()
+        self.getProperties()
+        self.getTransactions()
+        self._mapper = QtWidgets.QDataWidgetMapper()
+        self.buildTable()
+        self.buildStatList()
 
         """Filter Section"""
-        comboBox_filter = QtWidgets.QComboBox()
-        for header in headers:
-            comboBox_filter.addItem(header)
-        edit_filter = QtWidgets.QLineEdit()
-        edit_filter.setPlaceholderText('Enter Text')
+        self.filterComboBox = self.headerComboBox()
+        self.filterEdit = QtWidgets.QLineEdit()
+        self.filterEdit.setPlaceholderText('Enter Text')
 
         def filterTable():
-            proxyModel.setFilterKeyColumn(self._headersDict[comboBox_filter.currentText()])
-            proxyModel.setFilterRegExp(edit_filter.text())
+            self.proxyModel.setFilterKeyColumn(self._headersDict[self.filterComboBox.currentText()])
+            self.proxyModel.setFilterRegExp(self.filterEdit.text())
 
-        edit_filter.textChanged.connect(filterTable)
-
-        """Delete Method"""
-        def delete():
-            selectedRows = mainTable.selectionModel().selectedRows()
-            indices = []
-            for i in selectedRows:
-                indices.append(i.row())
-            indices.sort()
-            difference = 0
-            for index in indices:
-                row = index-difference
-                tableModel.removeRows(row=row,count=1)
-                difference += 1
-
+        self.filterEdit.textChanged.connect(filterTable)
 
         """Buttons"""
-        button_add = QtWidgets.QPushButton('Add Transaction', self)
-        button_add.clicked.connect(self.openAddDialog)
-        button_addCategory = QtWidgets.QPushButton('Add Category', self)
-        button_addCategory.clicked.connect(self.openAddCatDialog)
-        button_del = QtWidgets.QPushButton('Delete', self)
-        button_del.clicked.connect(delete)
+        self.addTransBttn = QtWidgets.QPushButton('Add Transaction', self)
+        self.addTransBttn.clicked.connect(self.openAddDialog)
+        self.addCatBttn = QtWidgets.QPushButton('Add Category', self)
+        self.addCatBttn.clicked.connect(self.openAddCatDialog)
+        button_del = QtWidgets.QPushButton('Delete Selected', self)
+        button_del.clicked.connect(self.deleteRows)
 
         """Top Grid"""
-        grid_insert = QtWidgets.QGridLayout()
-        grid_insert.addWidget(label_totalSpent,0,0)
-        grid_insert.addWidget(label_totalEarned,1,0)
-        grid_insert.addWidget(label_saved,2,0)
-        grid_insert.addWidget(button_add,3,0)
-        grid_insert.addWidget(button_addCategory,3,1)
-        grid_insert.addWidget(label_totalSpentValue,0,1)
-        grid_insert.addWidget(label_totalEarnedValue,1,1)
-        grid_insert.addWidget(label_totalSavedValue,2,1)
-        grid_insert.addWidget(comboBox_filter,3,2)
-        grid_insert.addWidget(edit_filter,3,3)
-        grid_insert.addWidget(button_del,3,4)
-        grid_insert.setColumnStretch(3,1)
-        grid_insert.setColumnStretch(4,1)
+        self.topGrid = QtWidgets.QGridLayout()
+        self.topGrid.addWidget(self.spentLabel,0,0)
+        self.topGrid.addWidget(self.earnedLabel,1,0)
+        self.topGrid.addWidget(self.savedLabel,2,0)
+        self.topGrid.addWidget(self.addTransBttn,3,0)
+        self.topGrid.addWidget(self.addCatBttn,3,1)
+        self.topGrid.addWidget(self.spentEdit,0,1)
+        self.topGrid.addWidget(self.earnedEdit,1,1)
+        self.topGrid.addWidget(self.savedEdit,2,1)
+        self.topGrid.addWidget(self.filterComboBox,3,2)
+        self.topGrid.addWidget(self.filterEdit,3,3)
+        self.topGrid.addWidget(button_del,3,4)
+        self.topGrid.setColumnStretch(3,1)
+        self.topGrid.setColumnStretch(4,1)
 
         """Main Layout"""
-        mainvbox = QtWidgets.QVBoxLayout()
-        mainvbox.addLayout(grid_insert)
-        mainvbox.addWidget(mainTable)
-        self.mainWidget = QtWidgets.QWidget()
-        self.mainWidget.setLayout(mainvbox)
-        self.setCentralWidget(self.mainWidget)
+        self._mainvbox = QtWidgets.QVBoxLayout()
+        self._mainvbox.addLayout(self.topGrid)
+        self._mainvbox.addWidget(self.mainTable)
+        self._mainWidget = QtWidgets.QWidget()
+        self._mainWidget.setLayout(self._mainvbox)
+        self.setCentralWidget(self._mainWidget)
+
+    def setCurrentDate(self):
+        self.currentDate = QtCore.QDate.currentDate()
 
     def centerScreen(self):
         rectangle = self.frameGeometry()
@@ -113,18 +145,20 @@ class MainWindow(QtWidgets.QMainWindow):
         self.move(rectangle.topLeft())
 
     def buildMenu(self):
-        mainMenu = self.menuBar()
-        fileMenu = mainMenu.addMenu('File')
-        editMenu = mainMenu.addMenu('Edit')
-        viewMenu = mainMenu.addMenu('View')
-        searchMenu = mainMenu.addMenu('Search')
-        toolsMenu = mainMenu.addMenu('Tools')
-        helpMenu = mainMenu.addMenu('Help')
-        fileMenu.addAction('Test')
+        self.mainMenu = self.menuBar()
+        self.fileMenu = self.mainMenu.addMenu('File')
+        self.fileMenu.addAction('Print')
+        self.editMenu = self.mainMenu.addMenu('Edit')
+        self.editMenu.addAction('Copy')
+        self.editMenu.addAction('Delete')
+        self.reportMenu = self.mainMenu.addMenu('Report')
+        self.reportMenu.addAction('Week')
+        self.reportMenu.addAction('Month')
+        self.reportMenu.addAction('Year')
 
     def DatePopup(self):
         dateEdit = QtWidgets.QDateEdit()
-        dateEdit.setDate(QtCore.QDate.currentDate())
+        dateEdit.setDate(self.currentDate)
         dateEdit.setCalendarPopup(True)
         dateEdit.setDisplayFormat('yyyy-MM-dd')
         return dateEdit
@@ -133,6 +167,18 @@ class MainWindow(QtWidgets.QMainWindow):
         header = table.horizontalHeader()
         for i in range(numColumns):
             header.setSectionResizeMode(i, QtWidgets.QHeaderView.Stretch)
+
+    def deleteRows(self):
+        selectedRows = self.mainTable.selectionModel().selectedRows()
+        indices = []
+        for i in selectedRows:
+            indices.append(i.row())
+        indices.sort()
+        difference = 0
+        for index in indices:
+            row = index-difference
+            self.tableModel.removeRows(row=row,count=1)
+            difference += 1
 
     def openAddDialog(self):
         addWindow = QtWidgets.QDialog()
@@ -149,23 +195,28 @@ class MainWindow(QtWidgets.QMainWindow):
             comboBox_category.addItem(row[1])
         edit_date = self.DatePopup()
         addButton = QtWidgets.QPushButton('Submit', addWindow)
+        cancelButton = QtWidgets.QPushButton('Cancel', addWindow)
 
         def submit():
             name = edit_name.text()
             date = edit_date.text()
             amount = edit_amount.text()
             category = comboBox_category.currentText()
-            data = [name,date,float(amount), self._categoriesDict[category]]
-            dbfunctions.AddTrans(values=data)
+            transaction = [name,date,float(amount), self._categoriesDict[category]]
+            db.AddTrans(values=transaction)
             addWindow.close()
 
         addButton.clicked.connect(submit)
+        cancelButton.clicked.connect(addWindow.close)
         mainlayout = QtWidgets.QVBoxLayout()
+        buttonlayout = QtWidgets.QHBoxLayout()
+        buttonlayout.addWidget(addButton)
+        buttonlayout.addWidget(cancelButton)
         mainlayout.addWidget(edit_name)
         mainlayout.addWidget(edit_amount)
         mainlayout.addWidget(comboBox_category)
         mainlayout.addWidget(edit_date)
-        mainlayout.addWidget(addButton)
+        mainlayout.addLayout(buttonlayout)
         addWindow.setLayout(mainlayout)
         addWindow.exec_()
         
@@ -176,19 +227,24 @@ class MainWindow(QtWidgets.QMainWindow):
         edit_category.setPlaceholderText('Category')
         checkBox_income = QtWidgets.QCheckBox('Income')
         addButton = QtWidgets.QPushButton('Submit', addWindow)
+        cancelButton = QtWidgets.QPushButton('Cancel', addWindow)
 
         def submit():
             category = edit_category.text()
             income = 0
             if checkBox_income.isChecked():
                 income = 1
-            dbfunctions.AddCategory(name=category, income=income)
+            db.AddCategory(name=category, income=income)
             addWindow.close()
 
         addButton.clicked.connect(submit)
+        cancelButton.clicked.connect(addWindow.close)
         mainlayout = QtWidgets.QVBoxLayout()
+        buttonlayout = QtWidgets.QVBoxLayout()
+        buttonlayout.addWidget(addButton)
+        buttonlayout.addWidget(cancelButton)
         mainlayout.addWidget(edit_category)
         mainlayout.addWidget(checkBox_income)
-        mainlayout.addWidget(addButton)
+        mainlayout.addLayout(buttonlayout)
         addWindow.setLayout(mainlayout)
         addWindow.exec_()
