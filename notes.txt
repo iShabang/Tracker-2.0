@@ -1,6 +1,8 @@
 2. Design a refresh feature to reflect new changes.
 2.1. rearrange the layout on the top.
 
+When adding a category check to see if the category exists already
+
 move uitools functions into MainWindow
 
 Add a Category screen displaying all the categories and their attributes. 
