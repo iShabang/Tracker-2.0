@@ -83,6 +83,7 @@ class MainWindow(QtWidgets.QMainWindow):
         return comboBox
 
     def buildFilter(self):
+        self.filterLabel = QtWidgets.QLabel('Filter')
         self.filterComboBox = self.headerComboBox()
         self.filterEdit = QtWidgets.QLineEdit()
         self.filterEdit.setPlaceholderText('Enter Text')
@@ -107,6 +108,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         """Buttons"""
         self.addTransBttn = QtWidgets.QPushButton('Add Transaction', self)
+        self.addTransBttn.setSizePolicy(QtWidgets.QSizePolicy.Expanding,QtWidgets.QSizePolicy.Expanding)
         self.addTransBttn.clicked.connect(self.openAddDialog)
 
         """Top Grid"""
@@ -114,14 +116,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.topGrid.addWidget(self.spentLabel,0,0)
         self.topGrid.addWidget(self.earnedLabel,1,0)
         self.topGrid.addWidget(self.savedLabel,2,0)
-        self.topGrid.addWidget(self.addTransBttn,1,2)
+        self.topGrid.addWidget(self.addTransBttn,0,2,3,1)
         self.topGrid.addWidget(self.spentEdit,0,1)
         self.topGrid.addWidget(self.earnedEdit,1,1)
         self.topGrid.addWidget(self.savedEdit,2,1)
-        self.topGrid.addWidget(self.filterComboBox,3,0)
-        self.topGrid.addWidget(self.filterEdit,3,1)
+        self.topGrid.addWidget(self.filterLabel,2,4)
+        self.topGrid.addWidget(self.filterComboBox,2,5)
+        self.topGrid.addWidget(self.filterEdit,2,6)
         self.topGrid.setColumnStretch(3,1)
-        self.topGrid.setColumnStretch(4,1)
 
         """Main Layout"""
         self._mainvbox = QtWidgets.QVBoxLayout()
