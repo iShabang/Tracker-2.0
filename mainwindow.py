@@ -31,7 +31,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.proxyModel = QtCore.QSortFilterProxyModel()
         self.proxyModel.setSourceModel(self.tableModel)
         self.mainTable.setModel(self.proxyModel)
-        #self.stretchTableHeaders(self.mainTable, 5)
+        if not self.isEmpty():
+            self.stretchTableHeaders(self.mainTable, 5)
         self.mainTable.setSortingEnabled(True)
         self.proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
         self.mainTable.sortByColumn(0, QtCore.Qt.AscendingOrder)
