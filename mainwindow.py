@@ -108,8 +108,6 @@ class MainWindow(QtWidgets.QMainWindow):
         """Buttons"""
         self.addTransBttn = QtWidgets.QPushButton('Add Transaction', self)
         self.addTransBttn.clicked.connect(self.openAddDialog)
-        self.addCatBttn = QtWidgets.QPushButton('Add Category', self)
-        self.addCatBttn.clicked.connect(self.openAddCatDialog)
         button_del = QtWidgets.QPushButton('Delete Selected', self)
         button_del.clicked.connect(self.deleteRows)
 
@@ -119,13 +117,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.topGrid.addWidget(self.earnedLabel,1,0)
         self.topGrid.addWidget(self.savedLabel,2,0)
         self.topGrid.addWidget(self.addTransBttn,3,0)
-        self.topGrid.addWidget(self.addCatBttn,3,1)
+        #self.topGrid.addWidget(self.addCatBttn,3,1)
         self.topGrid.addWidget(self.spentEdit,0,1)
         self.topGrid.addWidget(self.earnedEdit,1,1)
         self.topGrid.addWidget(self.savedEdit,2,1)
-        self.topGrid.addWidget(self.filterComboBox,3,2)
-        self.topGrid.addWidget(self.filterEdit,3,3)
-        self.topGrid.addWidget(button_del,3,4)
+        self.topGrid.addWidget(self.filterComboBox,3,1)
+        self.topGrid.addWidget(self.filterEdit,3,2)
+        self.topGrid.addWidget(button_del,3,3)
         self.topGrid.setColumnStretch(3,1)
         self.topGrid.setColumnStretch(4,1)
 
@@ -149,14 +147,27 @@ class MainWindow(QtWidgets.QMainWindow):
     def buildMenu(self):
         self.mainMenu = self.menuBar()
         self.fileMenu = self.mainMenu.addMenu('File')
-        self.fileMenu.addAction('Print')
         self.editMenu = self.mainMenu.addMenu('Edit')
+        self.reportMenu = self.mainMenu.addMenu('Report')
+
+        self.createActions()
+
         self.editMenu.addAction('Copy')
         self.editMenu.addAction('Delete')
-        self.reportMenu = self.mainMenu.addMenu('Report')
+        self.fileMenu.addAction(self.printAct)
+        self.fileMenu.addAction(self.addCatAct)
         self.reportMenu.addAction('Week')
         self.reportMenu.addAction('Month')
         self.reportMenu.addAction('Year')
+
+    def createActions(self):
+        self.printAct = QtWidgets.QAction()
+        self.printAct.setText("Print")
+        #self.printAct.triggered.connect()
+        
+        self.addCatAct = QtWidgets.QAction()
+        self.addCatAct.setText("Add Category")
+        self.addCatAct.triggered.connect(self.openAddCatDialog)
 
     def DatePopup(self):
         dateEdit = QtWidgets.QDateEdit()
@@ -239,6 +250,7 @@ class MainWindow(QtWidgets.QMainWindow):
             db.AddCategory(name=category, income=income)
             addWindow.close()
 
+
         addButton.clicked.connect(submit)
         cancelButton.clicked.connect(addWindow.close)
         mainlayout = QtWidgets.QVBoxLayout()
@@ -250,3 +262,4 @@ class MainWindow(QtWidgets.QMainWindow):
         mainlayout.addLayout(buttonlayout)
         addWindow.setLayout(mainlayout)
         addWindow.exec_()
+
