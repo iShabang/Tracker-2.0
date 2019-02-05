@@ -108,22 +108,18 @@ class MainWindow(QtWidgets.QMainWindow):
         """Buttons"""
         self.addTransBttn = QtWidgets.QPushButton('Add Transaction', self)
         self.addTransBttn.clicked.connect(self.openAddDialog)
-        button_del = QtWidgets.QPushButton('Delete Selected', self)
-        button_del.clicked.connect(self.deleteRows)
 
         """Top Grid"""
         self.topGrid = QtWidgets.QGridLayout()
         self.topGrid.addWidget(self.spentLabel,0,0)
         self.topGrid.addWidget(self.earnedLabel,1,0)
         self.topGrid.addWidget(self.savedLabel,2,0)
-        self.topGrid.addWidget(self.addTransBttn,3,0)
-        #self.topGrid.addWidget(self.addCatBttn,3,1)
+        self.topGrid.addWidget(self.addTransBttn,1,2)
         self.topGrid.addWidget(self.spentEdit,0,1)
         self.topGrid.addWidget(self.earnedEdit,1,1)
         self.topGrid.addWidget(self.savedEdit,2,1)
-        self.topGrid.addWidget(self.filterComboBox,3,1)
-        self.topGrid.addWidget(self.filterEdit,3,2)
-        self.topGrid.addWidget(button_del,3,3)
+        self.topGrid.addWidget(self.filterComboBox,3,0)
+        self.topGrid.addWidget(self.filterEdit,3,1)
         self.topGrid.setColumnStretch(3,1)
         self.topGrid.setColumnStretch(4,1)
 
@@ -152,10 +148,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.createActions()
 
-        self.editMenu.addAction('Copy')
-        self.editMenu.addAction('Delete')
         self.fileMenu.addAction(self.printAct)
         self.fileMenu.addAction(self.addCatAct)
+        self.editMenu.addAction('Copy')
+        self.editMenu.addAction(self.delAct)
         self.reportMenu.addAction('Week')
         self.reportMenu.addAction('Month')
         self.reportMenu.addAction('Year')
@@ -168,6 +164,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.addCatAct = QtWidgets.QAction()
         self.addCatAct.setText("Add Category")
         self.addCatAct.triggered.connect(self.openAddCatDialog)
+
+        self.delAct = QtWidgets.QAction()
+        self.delAct.setText("Delete")
+        self.delAct.triggered.connect(self.deleteRows)
 
     def DatePopup(self):
         dateEdit = QtWidgets.QDateEdit()
