@@ -82,6 +82,17 @@ class MainWindow(QtWidgets.QMainWindow):
             comboBox.addItem(header)
         return comboBox
 
+    def buildFilter(self):
+        self.filterComboBox = self.headerComboBox()
+        self.filterEdit = QtWidgets.QLineEdit()
+        self.filterEdit.setPlaceholderText('Enter Text')
+
+        def filterTable():
+            self.proxyModel.setFilterKeyColumn(self._headersDict[self.filterComboBox.currentText()])
+            self.proxyModel.setFilterRegExp(self.filterEdit.text())
+
+        self.filterEdit.textChanged.connect(filterTable)
+
     def initUI(self):
         self.setupWindow()
         self.setCurrentDate()
@@ -92,17 +103,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._mapper = QtWidgets.QDataWidgetMapper()
         self.buildTable()
         self.buildStatList()
-
-        """Filter Section"""
-        self.filterComboBox = self.headerComboBox()
-        self.filterEdit = QtWidgets.QLineEdit()
-        self.filterEdit.setPlaceholderText('Enter Text')
-
-        def filterTable():
-            self.proxyModel.setFilterKeyColumn(self._headersDict[self.filterComboBox.currentText()])
-            self.proxyModel.setFilterRegExp(self.filterEdit.text())
-
-        self.filterEdit.textChanged.connect(filterTable)
+        self.buildFilter()
 
         """Buttons"""
         self.addTransBttn = QtWidgets.QPushButton('Add Transaction', self)
