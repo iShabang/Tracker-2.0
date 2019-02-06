@@ -41,7 +41,8 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.isEmpty():
             data = []
         else:
-            data = self.calcStats()
+            self.calcStats()
+            data = self.stats
         self.statList = QtWidgets.QTableView()
         self.listModel = models.listModel(data=data)
         self.statList.setModel(self.listModel)
@@ -61,8 +62,7 @@ class MainWindow(QtWidgets.QMainWindow):
         amountSpent = sum(uitools.getColumnSpent(self.trans, 3, self.incomeCategory))
         amountEarned = sum(uitools.getColumnEarned(self.trans, 3, self.incomeCategory))
         amountSaved = amountEarned - amountSpent
-        data = [[str(amountSpent),str(amountEarned),str(amountSaved)]]
-        return data
+        self.stats = [[str(amountSpent),str(amountEarned),str(amountSaved)]]
         
 
     def setDateInterval(self, thisMonth = True, lowdate = None, highdate = None): 
@@ -225,6 +225,8 @@ class MainWindow(QtWidgets.QMainWindow):
             transaction = [name,date,float(amount), self._categoriesDict[category]]
             position = self.tableModel.rowCount()
             self.tableModel.insertRows(position, 1, data=transaction)
+            self.calcStats()
+            self.listModel.updateData(data=self.stats)
             addWindow.close()
 
         addButton.clicked.connect(submit)
