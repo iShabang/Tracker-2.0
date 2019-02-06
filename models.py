@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, QtWidgets, QtGui
-import dbfunctions
+import dbfunctions as db
 
 
 class listModel(QtCore.QAbstractTableModel):
@@ -40,7 +40,7 @@ class tableModel(QtCore.QAbstractTableModel):
         if len(self._data) == 0:
             return True
 
-    def rowCount(self, parent):
+    def rowCount(self, parent = None):
         return len(self._data)
 
     def columnCount(self, parent):
@@ -58,14 +58,14 @@ class tableModel(QtCore.QAbstractTableModel):
             value = self._data[row][column]
             return value
 
-    def insertRows(self, position, rows, parent = QtCore.QModelIndex()):
+    def insertRows(self, position, rows, data, parent = QtCore.QModelIndex()):
         self.beginInsertRows(parent, position, position + rows - 1)
-
-        #insert stuff
-
+        db.AddTrans(values=data)
+        newEntry = db.getLastTrans()
+        self._data.append(newEntry) 
         self.endInsertRows()
-
         return True
+
 
     def removeRows(self, row, count, parent = QtCore.QModelIndex()):
         self.beginRemoveRows(parent, row, row + count - 1) 

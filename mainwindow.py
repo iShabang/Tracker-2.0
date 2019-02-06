@@ -218,7 +218,8 @@ class MainWindow(QtWidgets.QMainWindow):
             amount = edit_amount.text()
             category = comboBox_category.currentText()
             transaction = [name,date,float(amount), self._categoriesDict[category]]
-            db.AddTrans(values=transaction)
+            position = self.tableModel.rowCount()
+            self.tableModel.insertRows(position, 1, data=transaction)
             addWindow.close()
 
         addButton.clicked.connect(submit)

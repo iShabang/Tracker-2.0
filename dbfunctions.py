@@ -47,6 +47,14 @@ def DelBill(cursor, bill_id):
     cursor.execute("DELETE FROM bills WHERE bill_id=?", (bill_id,))
 
 @DbConnectQuery
+def getLastTrans(cursor):
+    cursor.execute('''
+    SELECT trans.trans_id, trans.name, trans.date, printf("%.2f",trans.amount), category.name
+    FROM trans INNER JOIN category ON trans.cat_id = category.cat_id
+    WHERE trans.trans_id = (SELECT MAX(trans.trans_id) FROM trans)''')
+    return cursor.fetchone()
+
+@DbConnectQuery
 def getTransByDate(cursor, lowdate, highdate):
     cursor.execute('''
     SELECT trans.trans_id, trans.name, trans.date, printf("%.2f", trans.amount), category.name
