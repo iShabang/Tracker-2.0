@@ -41,10 +41,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.isEmpty():
             data = []
         else:
-            amountSpent = sum(uitools.getColumnSpent(self.trans, 3, self.incomeCategory))
-            amountEarned = sum(uitools.getColumnEarned(self.trans, 3, self.incomeCategory))
-            amountSaved = amountEarned - amountSpent
-            data = [[str(amountSpent),str(amountEarned),str(amountSaved)]]
+            data = self.calcStats()
         self.statList = QtWidgets.QTableView()
         self.listModel = models.listModel(data=data)
         self.statList.setModel(self.listModel)
@@ -59,6 +56,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self._mapper.addMapping(self.earnedEdit, 1)
         self._mapper.addMapping(self.savedEdit, 2)
         self._mapper.toFirst()
+
+    def calcStats(self):
+        amountSpent = sum(uitools.getColumnSpent(self.trans, 3, self.incomeCategory))
+        amountEarned = sum(uitools.getColumnEarned(self.trans, 3, self.incomeCategory))
+        amountSaved = amountEarned - amountSpent
+        data = [[str(amountSpent),str(amountEarned),str(amountSaved)]]
+        return data
+        
 
     def setDateInterval(self, thisMonth = True, lowdate = None, highdate = None): 
         if not thisMonth:
