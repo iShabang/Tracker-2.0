@@ -29,16 +29,6 @@ class listModel(QtCore.QAbstractTableModel):
             value = self._data[row][column]
             return value
 
-    def updateData(self, data, parent = QtCore.QModelIndex()):
-        self.removeRows(0, 1)
-        self.beginInsertRows(parent, 0, 0)
-        self._data.append(data) 
-        self.endInsertRows()
-        self.dataChanged.emit(QtCore.QModelIndex(), QtCore.QModelIndex())
-        print(self._data)
-        return True
-
-
     def removeRows(self, row, count, parent = QtCore.QModelIndex()):
         self.beginRemoveRows(parent, row, row + count - 1) 
 
@@ -47,6 +37,15 @@ class listModel(QtCore.QAbstractTableModel):
 
         self.endRemoveRows()
         return True
+
+    def changeData(self, data):
+        self._data = data
+        spentIndex = self.createIndex(0,0)
+        earnedIndex = self.createIndex(0,1)
+        savedIndex = self.createIndex(0,2)
+        self.dataChanged.emit(spentIndex, spentIndex)
+        self.dataChanged.emit(earnedIndex, earnedIndex)
+        self.dataChanged.emit(savedIndex, savedIndex)
 
 class tableModel(QtCore.QAbstractTableModel):
     def __init__(self, data = [[]], headers = [], parent = None):

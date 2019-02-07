@@ -226,7 +226,7 @@ class MainWindow(QtWidgets.QMainWindow):
             position = self.tableModel.rowCount()
             self.tableModel.insertRows(position, 1, data=transaction)
             self.calcStats()
-            self.listModel.updateData(data=self.stats)
+            self.listModel.changeData(self.stats)
             addWindow.close()
 
         addButton.clicked.connect(submit)
