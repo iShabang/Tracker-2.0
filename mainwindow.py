@@ -197,6 +197,8 @@ class MainWindow(QtWidgets.QMainWindow):
             row = index-difference
             self.tableModel.removeRows(row=row,count=1)
             difference += 1
+        self.calcStats()
+        self.listModel.changeData(self.stats)
 
     def openAddDialog(self):
         addWindow = QtWidgets.QDialog()
@@ -233,10 +235,10 @@ class MainWindow(QtWidgets.QMainWindow):
         buttonlayout = QtWidgets.QHBoxLayout()
         buttonlayout.addWidget(addButton)
         buttonlayout.addWidget(cancelButton)
+        mainlayout.addWidget(edit_date)
         mainlayout.addWidget(edit_name)
         mainlayout.addWidget(edit_amount)
         mainlayout.addWidget(comboBox_category)
-        mainlayout.addWidget(edit_date)
         mainlayout.addLayout(buttonlayout)
         addWindow.setLayout(mainlayout)
         addWindow.exec_()
