@@ -1,6 +1,4 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
-from decimal import getcontext, Decimal
-import datetime
 
 import dbfunctions as db
 import models
