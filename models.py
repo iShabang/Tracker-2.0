@@ -88,7 +88,7 @@ class tableModel(QtCore.QAbstractTableModel):
         self.beginRemoveRows(parent, row, row + count - 1) 
 
         for i in range(count):
-            dbfunctions.DelTrans(id_num=self._data[row][0])
+            db.DelTrans(id_num=self._data[row][0])
             del self._data[row]
 
         self.endRemoveRows()
