@@ -9,28 +9,79 @@ class MainWindow(QtWidgets.QMainWindow):
         super().__init__()
         self.initUI()
 
+    def initUI(self):
+        self.setupWindow()
+        self.setCurrentDate()
+        self.setDateInterval()
+        self.buildMenu()
+        self.getIncomeCatList()
+        self.getCategories()
+        self.buildCatDict()
+        self.setHeaders(["ID", "Name", "Date", "Amount", "Category"])
+        self.buildHeaderDict()
+        self.getTransactions()
+        self.buildTable(self.trans)
+        self.buildStatList()
+        self.buildFilter()
+
+        """Buttons"""
+        self.addTransBttn = QtWidgets.QPushButton('Add Transaction', self)
+        self.addTransBttn.setSizePolicy(QtWidgets.QSizePolicy.Expanding,QtWidgets.QSizePolicy.Expanding)
+        self.addTransBttn.clicked.connect(self.openAddDialog)
+
+        """Top Grid"""
+        self.topGrid = QtWidgets.QGridLayout()
+        self.topGrid.addWidget(self.spentLabel,0,0)
+        self.topGrid.addWidget(self.earnedLabel,1,0)
+        self.topGrid.addWidget(self.savedLabel,2,0)
+        self.topGrid.addWidget(self.addTransBttn,0,2,3,1)
+        self.topGrid.addWidget(self.spentEdit,0,1)
+        self.topGrid.addWidget(self.earnedEdit,1,1)
+        self.topGrid.addWidget(self.savedEdit,2,1)
+        self.topGrid.addWidget(self.filterLabel,2,4)
+        self.topGrid.addWidget(self.filterComboBox,2,5)
+        self.topGrid.addWidget(self.filterEdit,2,6)
+        self.topGrid.setColumnStretch(3,1)
+
+        """Main Layout"""
+        self._mainvbox = QtWidgets.QVBoxLayout()
+        self._mainvbox.addLayout(self.topGrid)
+        self._mainvbox.addWidget(self.mainTable)
+        self._mainWidget = QtWidgets.QWidget()
+        self._mainWidget.setLayout(self._mainvbox)
+        self.setCentralWidget(self._mainWidget)
+
     def setupWindow(self):
         self.setWindowTitle("Full Test Application")
         self.setGeometry(10,10,600,400)
         self.centerScreen()
 
-    def getProperties(self):
+    def getIncomeCatList(self):
+        self.incomeCatList = uitools.findIncomeCategory()
+
+    def getCategories(self):
         self.categories = db.GetAllCategories()
+        
+    def buildCatDict(self):
         self._categoriesDict = {}
         for row in self.categories:
             self._categoriesDict[row[1]] = row[0]
-        self.headers = ["ID", "Name", "Date", "Price", "Category"]
-        self._headersDict = dict(zip(self.headers,range(len(self.headers))))    
-        self.incomeCategory = uitools.findIncomeCategory()
 
-    def buildTable(self):
+    def setHeaders(self, headers):
+        self.headers = headers
+
+    def buildHeaderDict(self):
+        self._headerDict = dict(zip(self.headers,range(len(self.headers))))    
+
+
+    def buildTable(self, data):
         self.mainTable = QtWidgets.QTableView()
-        self.tableModel = models.tableModel(data=self.trans, headers=self.headers)
+        self.tableModel = models.tableModel(data=data, headers=self.headers)
         self.proxyModel = QtCore.QSortFilterProxyModel()
         self.proxyModel.setSourceModel(self.tableModel)
         self.mainTable.setModel(self.proxyModel)
         if not self.isEmpty():
-            self.stretchTableHeaders(self.mainTable, 5)
+            self.stretchTableHeaders(self.mainTable, len(data[0]))
         self.mainTable.setSortingEnabled(True)
         self.proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
         self.mainTable.sortByColumn(0, QtCore.Qt.AscendingOrder)
@@ -50,6 +101,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.spentEdit = QtWidgets.QLineEdit()
         self.earnedEdit = QtWidgets.QLineEdit()
         self.savedEdit = QtWidgets.QLineEdit()
+        self._mapper = QtWidgets.QDataWidgetMapper()
         self._mapper.setModel(self.listModel)
         self._mapper.addMapping(self.spentEdit, 0)
         self._mapper.addMapping(self.earnedEdit, 1)
@@ -57,8 +109,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self._mapper.toFirst()
 
     def calcStats(self):
-        amountSpent = sum(uitools.getColumnSpent(self.trans, 3, self.incomeCategory))
-        amountEarned = sum(uitools.getColumnEarned(self.trans, 3, self.incomeCategory))
+        amountSpent = sum(uitools.getColumnSpent(self.trans, 3, self.incomeCatList))
+        amountEarned = sum(uitools.getColumnEarned(self.trans, 3, self.incomeCatList))
         amountSaved = amountEarned - amountSpent
         self.stats = [[str(amountSpent),str(amountEarned),str(amountSaved)]]
         
@@ -92,49 +144,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.filterEdit.setPlaceholderText('Enter Text')
 
         def filterTable():
-            self.proxyModel.setFilterKeyColumn(self._headersDict[self.filterComboBox.currentText()])
+            self.proxyModel.setFilterKeyColumn(self._headerDict[self.filterComboBox.currentText()])
             self.proxyModel.setFilterRegExp(self.filterEdit.text())
 
         self.filterEdit.textChanged.connect(filterTable)
 
-    def initUI(self):
-        self.setupWindow()
-        self.setCurrentDate()
-        self.setDateInterval()
-        self.buildMenu()
-        self.getProperties()
-        self.getTransactions()
-        self._mapper = QtWidgets.QDataWidgetMapper()
-        self.buildTable()
-        self.buildStatList()
-        self.buildFilter()
-
-        """Buttons"""
-        self.addTransBttn = QtWidgets.QPushButton('Add Transaction', self)
-        self.addTransBttn.setSizePolicy(QtWidgets.QSizePolicy.Expanding,QtWidgets.QSizePolicy.Expanding)
-        self.addTransBttn.clicked.connect(self.openAddDialog)
-
-        """Top Grid"""
-        self.topGrid = QtWidgets.QGridLayout()
-        self.topGrid.addWidget(self.spentLabel,0,0)
-        self.topGrid.addWidget(self.earnedLabel,1,0)
-        self.topGrid.addWidget(self.savedLabel,2,0)
-        self.topGrid.addWidget(self.addTransBttn,0,2,3,1)
-        self.topGrid.addWidget(self.spentEdit,0,1)
-        self.topGrid.addWidget(self.earnedEdit,1,1)
-        self.topGrid.addWidget(self.savedEdit,2,1)
-        self.topGrid.addWidget(self.filterLabel,2,4)
-        self.topGrid.addWidget(self.filterComboBox,2,5)
-        self.topGrid.addWidget(self.filterEdit,2,6)
-        self.topGrid.setColumnStretch(3,1)
-
-        """Main Layout"""
-        self._mainvbox = QtWidgets.QVBoxLayout()
-        self._mainvbox.addLayout(self.topGrid)
-        self._mainvbox.addWidget(self.mainTable)
-        self._mainWidget = QtWidgets.QWidget()
-        self._mainWidget.setLayout(self._mainvbox)
-        self.setCentralWidget(self._mainWidget)
 
     def setCurrentDate(self):
         self.currentDate = QtCore.QDate.currentDate()
@@ -273,3 +287,19 @@ class MainWindow(QtWidgets.QMainWindow):
         addWindow.setLayout(mainlayout)
         addWindow.exec_()
 
+
+class CatWindow(MainWindow):
+    def __init__(self):
+       super().__init__()
+
+    def initUI(self):
+        self.setupWindow()
+        self.setCurrentDate()
+        self.setDateInterval()
+        self._mapper = QtWidgets.QDataWidgetMapper()
+        self.buildTable(self.categories)
+
+    def isEmpty(self):
+        if len(self.categories) == 0:
+            return True
+        return False
