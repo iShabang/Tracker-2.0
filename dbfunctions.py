@@ -102,3 +102,11 @@ def GetAllCategories(cursor):
     SELECT cat_id, name, income
     FROM category""")
     return cursor.fetchall()
+
+@DbConnectQuery
+def getCatNamesType(cursor):
+    cursor.execute("""
+    SELECT category.name, category.income
+    FROM category""")
+    return cursor.fetchall()
+
