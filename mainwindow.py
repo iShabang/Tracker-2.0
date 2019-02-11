@@ -316,22 +316,3 @@ class MainWindow(QtWidgets.QMainWindow):
         addWindow.setLayout(mainlayout)
         addWindow.exec_()
 
-
-class CatWindow(MainWindow):
-    def __init__(self):
-       super().__init__()
-
-    def initUI(self):
-        self.setupWindow()
-        self.setCurrentDate()
-        self.setDateInterval()
-        self.getCategories()
-        print(self.categories)
-        self.setHeaders(["ID", "Name", "Income"])
-        self._mapper = QtWidgets.QDataWidgetMapper()
-        self.buildTable(self.categories)
-
-    def isEmpty(self):
-        if len(self.categories) == 0:
-            return True
-        return False
