@@ -203,7 +203,19 @@ class MainWindow(QtWidgets.QMainWindow):
     def categoryDialog(self):
         catDialog = QtWidgets.QDialog()
         catDialog.setWindowTitle("Categories")
-        #catTable = 
+        catDialog.setGeometry(10,10,600,400)
+        model = models.tableModel(data=self.categories, headers=["ID","Name","Income"])
+        proxyModel = QtCore.QSortFilterProxyModel()
+        proxyModel.setSourceModel(model)
+        catTable = self.buildTable(model, proxyModel)
+        closeButton = QtWidgets.QPushButton("Close", catDialog)
+        closeButton.clicked.connect(catDialog.close)
+        mainlayout = QtWidgets.QVBoxLayout() 
+        mainlayout.addWidget(catTable)
+        mainlayout.addWidget(closeButton)
+        catDialog.setLayout(mainlayout)
+        catDialog.exec_()
+
 
     def DatePopup(self):
         dateEdit = QtWidgets.QDateEdit()
