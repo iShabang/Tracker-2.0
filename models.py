@@ -60,7 +60,7 @@ class tableModel(QtCore.QAbstractTableModel):
     def rowCount(self, parent = None):
         return len(self._data)
 
-    def columnCount(self, parent):
+    def columnCount(self, parent = None):
         if self.isEmpty():
             return 0
         return len(self._data[0])

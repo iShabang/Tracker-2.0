@@ -17,12 +17,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self.getIncomeCatList()
         self.getCategories()
         self.buildCatDict()
-        self.setHeaders(["ID", "Name", "Date", "Amount", "Category"])
+        self.setHeaders(["ID","Name","Date","Amount","Category"])
         self.buildHeaderDict()
         self.getTransactions()
-        self.buildTable(self.trans)
         self.buildStatList()
         self.buildFilter()
+        model = models.tableModel(data=self.trans, headers=self.headers)
+        self.setModel(model)
+        self.setProxyModel(self.tableModel)
+        self.mainTable = self.buildTable(model=self.tableModel, proxyModel=self.proxyModel)
 
         """Buttons"""
         self.addTransBttn = QtWidgets.QPushButton('Add Transaction', self)
@@ -73,18 +76,22 @@ class MainWindow(QtWidgets.QMainWindow):
     def buildHeaderDict(self):
         self._headerDict = dict(zip(self.headers,range(len(self.headers))))    
 
+    def setModel(self, model):
+        self.tableModel = model
 
-    def buildTable(self, data):
-        self.mainTable = QtWidgets.QTableView()
-        self.tableModel = models.tableModel(data=data, headers=self.headers)
+    def setProxyModel(self, model):
         self.proxyModel = QtCore.QSortFilterProxyModel()
-        self.proxyModel.setSourceModel(self.tableModel)
-        self.mainTable.setModel(self.proxyModel)
-        if not self.isEmpty():
-            self.stretchTableHeaders(self.mainTable, len(data[0]))
-        self.mainTable.setSortingEnabled(True)
-        self.proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
-        self.mainTable.sortByColumn(0, QtCore.Qt.AscendingOrder)
+        self.proxyModel.setSourceModel(model)
+
+    def buildTable(self, model, proxyModel):
+        table = QtWidgets.QTableView()
+        table.setModel(proxyModel)
+        if not model.columnCount() == 0:
+            self.stretchTableHeaders(table, model.columnCount())
+        table.setSortingEnabled(True)
+        proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
+        table.sortByColumn(0, QtCore.Qt.AscendingOrder)
+        return table
 
     def buildStatList(self):
         if self.isEmpty():
@@ -170,6 +177,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.fileMenu.addAction(self.printAct)
         self.fileMenu.addAction(self.addCatAct)
         self.editMenu.addAction('Copy')
+        self.editMenu.addAction(self.catWindow)
         self.editMenu.addAction(self.delAct)
         self.reportMenu.addAction('Week')
         self.reportMenu.addAction('Month')
@@ -187,6 +195,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self.delAct = QtWidgets.QAction()
         self.delAct.setText("Delete")
         self.delAct.triggered.connect(self.deleteRows)
+
+        self.catWindow = QtWidgets.QAction()
+        self.catWindow.setText("Categories")
+        self.catWindow.triggered.connect(self.categoryDialog)
+
+    def categoryDialog(self):
+        catDialog = QtWidgets.QDialog()
+        catDialog.setWindowTitle("Categories")
+        #catTable = 
 
     def DatePopup(self):
         dateEdit = QtWidgets.QDateEdit()
@@ -296,6 +313,9 @@ class CatWindow(MainWindow):
         self.setupWindow()
         self.setCurrentDate()
         self.setDateInterval()
+        self.getCategories()
+        print(self.categories)
+        self.setHeaders(["ID", "Name", "Income"])
         self._mapper = QtWidgets.QDataWidgetMapper()
         self.buildTable(self.categories)
 
