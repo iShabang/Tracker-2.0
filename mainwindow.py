@@ -59,6 +59,71 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setGeometry(10,10,600,400)
         self.centerScreen()
 
+    def centerScreen(self):
+        rectangle = self.frameGeometry()
+        centerPoint = QtWidgets.QDesktopWidget().availableGeometry().center()
+        rectangle.moveCenter(centerPoint)
+        self.move(rectangle.topLeft())
+
+    def buildMenu(self):
+        self.mainMenu = self.menuBar()
+        self.fileMenu = self.mainMenu.addMenu('File')
+        self.editMenu = self.mainMenu.addMenu('Edit')
+        self.reportMenu = self.mainMenu.addMenu('Report')
+
+        self.createActions()
+
+        self.fileMenu.addAction(self.printAct)
+        self.fileMenu.addAction(self.addCatAct)
+        self.editMenu.addAction('Copy')
+        self.editMenu.addAction(self.catWindow)
+        self.editMenu.addAction(self.delAct)
+        self.reportMenu.addAction('Week')
+        self.reportMenu.addAction('Month')
+        self.reportMenu.addAction('Year')
+
+    def createActions(self):
+        self.printAct = QtWidgets.QAction()
+        self.printAct.setText("Print")
+        #self.printAct.triggered.connect()
+        
+        self.addCatAct = QtWidgets.QAction()
+        self.addCatAct.setText("Add Category")
+        self.addCatAct.triggered.connect(self.addCatDialog)
+
+        self.delAct = QtWidgets.QAction()
+        self.delAct.setText("Delete")
+        self.delAct.triggered.connect(self.deleteRows)
+
+        self.catWindow = QtWidgets.QAction()
+        self.catWindow.setText("Categories")
+        self.catWindow.triggered.connect(self.categoryDialog)
+
+    def setHeaders(self, headers):
+        self.headers = headers
+
+    def setModel(self, model):
+        self.tableModel = model
+
+    def setProxyModel(self, model):
+        self.proxyModel = QtCore.QSortFilterProxyModel()
+        self.proxyModel.setSourceModel(model)
+
+
+    def setDateInterval(self, thisMonth = True, lowdate = None, highdate = None): 
+        if not thisMonth:
+            self.lowdate = lowdate
+            self.highdate = highdate
+        else:
+            self.lowdate = self.currentDate.toString("yyyy-MM-00")
+            self.highdate = self.currentDate.toString("yyyy-MM-dd")
+
+    def setCurrentDate(self):
+        self.currentDate = QtCore.QDate.currentDate()
+
+    def getTransactions(self):
+        self.trans = db.getTransByDate(lowdate=self.lowdate, highdate=self.highdate)
+
     def getIncomeCatList(self):
         self.incomeCatList = uitools.findIncomeCategory()
 
@@ -70,18 +135,8 @@ class MainWindow(QtWidgets.QMainWindow):
         for row in self.categories:
             self._categoriesDict[row[1]] = row[0]
 
-    def setHeaders(self, headers):
-        self.headers = headers
-
     def buildHeaderDict(self):
         self._headerDict = dict(zip(self.headers,range(len(self.headers))))    
-
-    def setModel(self, model):
-        self.tableModel = model
-
-    def setProxyModel(self, model):
-        self.proxyModel = QtCore.QSortFilterProxyModel()
-        self.proxyModel.setSourceModel(model)
 
     def buildTable(self, model, proxyModel):
         table = QtWidgets.QTableView()
@@ -121,18 +176,6 @@ class MainWindow(QtWidgets.QMainWindow):
         amountSaved = amountEarned - amountSpent
         self.stats = [[str(amountSpent),str(amountEarned),str(amountSaved)]]
         
-
-    def setDateInterval(self, thisMonth = True, lowdate = None, highdate = None): 
-        if not thisMonth:
-            self.lowdate = lowdate
-            self.highdate = highdate
-        else:
-            self.lowdate = self.currentDate.toString("yyyy-MM-00")
-            self.highdate = self.currentDate.toString("yyyy-MM-dd")
-
-    def getTransactions(self):
-        self.trans = db.getTransByDate(lowdate=self.lowdate, highdate=self.highdate)
-
     def isEmpty(self):
         if len(self.trans) == 0:
             return True
@@ -156,50 +199,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.filterEdit.textChanged.connect(filterTable)
 
-
-    def setCurrentDate(self):
-        self.currentDate = QtCore.QDate.currentDate()
-
-    def centerScreen(self):
-        rectangle = self.frameGeometry()
-        centerPoint = QtWidgets.QDesktopWidget().availableGeometry().center()
-        rectangle.moveCenter(centerPoint)
-        self.move(rectangle.topLeft())
-
-    def buildMenu(self):
-        self.mainMenu = self.menuBar()
-        self.fileMenu = self.mainMenu.addMenu('File')
-        self.editMenu = self.mainMenu.addMenu('Edit')
-        self.reportMenu = self.mainMenu.addMenu('Report')
-
-        self.createActions()
-
-        self.fileMenu.addAction(self.printAct)
-        self.fileMenu.addAction(self.addCatAct)
-        self.editMenu.addAction('Copy')
-        self.editMenu.addAction(self.catWindow)
-        self.editMenu.addAction(self.delAct)
-        self.reportMenu.addAction('Week')
-        self.reportMenu.addAction('Month')
-        self.reportMenu.addAction('Year')
-
-    def createActions(self):
-        self.printAct = QtWidgets.QAction()
-        self.printAct.setText("Print")
-        #self.printAct.triggered.connect()
-        
-        self.addCatAct = QtWidgets.QAction()
-        self.addCatAct.setText("Add Category")
-        self.addCatAct.triggered.connect(self.openAddCatDialog)
-
-        self.delAct = QtWidgets.QAction()
-        self.delAct.setText("Delete")
-        self.delAct.triggered.connect(self.deleteRows)
-
-        self.catWindow = QtWidgets.QAction()
-        self.catWindow.setText("Categories")
-        self.catWindow.triggered.connect(self.categoryDialog)
-
     def categoryDialog(self):
         catDialog = QtWidgets.QDialog()
         catDialog.setWindowTitle("Categories")
@@ -208,16 +207,23 @@ class MainWindow(QtWidgets.QMainWindow):
         proxyModel = QtCore.QSortFilterProxyModel()
         proxyModel.setSourceModel(model)
         catTable = self.buildTable(model, proxyModel)
+        addButton = QtWidgets.QPushButton("Add",catDialog)
+        addButton.clicked.connect(self.addCatDialog)
+        deleteButton = QtWidgets.QPushButton("Delete", catDialog)
+        deleteButton.clicked.connect(self.deleteCategory)
         closeButton = QtWidgets.QPushButton("Close", catDialog)
         closeButton.clicked.connect(catDialog.close)
+        toplayout = QtWidgets.QHBoxLayout()
+        toplayout.addWidget(addButton)
+        toplayout.addWidget(deleteButton)
         mainlayout = QtWidgets.QVBoxLayout() 
+        mainlayout.addLayout(toplayout)
         mainlayout.addWidget(catTable)
         mainlayout.addWidget(closeButton)
         catDialog.setLayout(mainlayout)
         catDialog.exec_()
 
-
-    def DatePopup(self):
+    def datePopup(self):
         dateEdit = QtWidgets.QDateEdit()
         dateEdit.setDate(self.currentDate)
         dateEdit.setCalendarPopup(True)
@@ -228,6 +234,9 @@ class MainWindow(QtWidgets.QMainWindow):
         header = table.horizontalHeader()
         for i in range(numColumns):
             header.setSectionResizeMode(i, QtWidgets.QHeaderView.Stretch)
+
+    def deleteCategory(self, ID):
+        db.delCategory(ID)
 
     def deleteRows(self):
         selectedRows = self.mainTable.selectionModel().selectedRows()
@@ -256,7 +265,7 @@ class MainWindow(QtWidgets.QMainWindow):
         comboBox_category = QtWidgets.QComboBox()
         for row in self.categories:
             comboBox_category.addItem(row[1])
-        edit_date = self.DatePopup()
+        edit_date = self.datePopup()
         addButton = QtWidgets.QPushButton('Submit', addWindow)
         cancelButton = QtWidgets.QPushButton('Cancel', addWindow)
 
@@ -286,7 +295,7 @@ class MainWindow(QtWidgets.QMainWindow):
         addWindow.setLayout(mainlayout)
         addWindow.exec_()
         
-    def openAddCatDialog(self):
+    def addCatDialog(self):
         addWindow = QtWidgets.QDialog()
         addWindow.setWindowTitle("Adding Category")
         edit_category = QtWidgets.QLineEdit()
