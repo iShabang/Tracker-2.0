@@ -1,19 +1,19 @@
 import sqlite3
 
 def DbConnectQuery(func):
-    def wrapper(**kwargs):
+    def wrapper(*args,**kwargs):
         connection = sqlite3.connect('tracker.db')
         cursor = connection.cursor()
-        data = func(cursor,**kwargs)
+        data = func(cursor,*args,**kwargs)
         connection.close()
         return data
     return wrapper
 
 def DbConnectAction(func):
-    def wrapper(**kwargs):
+    def wrapper(*args,**kwargs):
         connection = sqlite3.connect('tracker.db')
         cursor = connection.cursor()
-        func(cursor,**kwargs)
+        func(cursor,*args,**kwargs)
         connection.commit()
         connection.close()
     return wrapper

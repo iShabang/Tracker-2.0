@@ -93,7 +93,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.delAct = QtWidgets.QAction()
         self.delAct.setText("Delete")
-        self.delAct.triggered.connect(self.deleteRows)
+        self.delAct.triggered.connect(self.deleteTrans)
 
         self.catWindow = QtWidgets.QAction()
         self.catWindow.setText("Categories")
@@ -209,8 +209,12 @@ class MainWindow(QtWidgets.QMainWindow):
         catTable = self.buildTable(model, proxyModel)
         addButton = QtWidgets.QPushButton("Add",catDialog)
         addButton.clicked.connect(self.addCatDialog)
+
+        def deleteCategory():
+            self.deleteRows(catTable,model,"cat")
+
         deleteButton = QtWidgets.QPushButton("Delete", catDialog)
-        deleteButton.clicked.connect(self.deleteCategory)
+        deleteButton.clicked.connect(deleteCategory)
         closeButton = QtWidgets.QPushButton("Close", catDialog)
         closeButton.clicked.connect(catDialog.close)
         toplayout = QtWidgets.QHBoxLayout()
@@ -235,11 +239,14 @@ class MainWindow(QtWidgets.QMainWindow):
         for i in range(numColumns):
             header.setSectionResizeMode(i, QtWidgets.QHeaderView.Stretch)
 
-    def deleteCategory(self, ID):
-        db.delCategory(ID)
+    def deleteTrans(self):
+        self.deleteRows(self.mainTable, self.tableModel, "trans")
+        self.calcStats()
+        self.listModel.changeData(self.stats)
+        
 
-    def deleteRows(self):
-        selectedRows = self.mainTable.selectionModel().selectedRows()
+    def deleteRows(self, table, model, itemType):
+        selectedRows = table.selectionModel().selectedRows()
         indices = []
         for i in selectedRows:
             indices.append(i.row())
@@ -247,10 +254,8 @@ class MainWindow(QtWidgets.QMainWindow):
         difference = 0
         for index in indices:
             row = index-difference
-            self.tableModel.removeRows(row=row,count=1)
+            model.removeRows(row=row,count=1, itemType=itemType)
             difference += 1
-        self.calcStats()
-        self.listModel.changeData(self.stats)
 
     def openAddDialog(self):
         addWindow = QtWidgets.QDialog()

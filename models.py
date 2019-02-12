@@ -84,11 +84,16 @@ class tableModel(QtCore.QAbstractTableModel):
         return True
 
 
-    def removeRows(self, row, count, parent = QtCore.QModelIndex()):
+    def removeRows(self, row, count, itemType, parent = QtCore.QModelIndex()):
         self.beginRemoveRows(parent, row, row + count - 1) 
 
+        if itemType == "trans":
+            func = db.DelTrans
+        elif itemType == "cat":
+            func = db.DelCategory
+
         for i in range(count):
-            db.DelTrans(id_num=self._data[row][0])
+            func(self._data[row][0])
             del self._data[row]
 
         self.endRemoveRows()
