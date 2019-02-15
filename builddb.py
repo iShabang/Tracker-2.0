@@ -19,8 +19,11 @@ c.execute('''CREATE TABLE IF NOT EXISTS trans (
                 date TEXT, 
                 amount REAL,
                 cat_id INTEGER,
-                FOREIGN KEY(cat_id)
-                REFERENCES category(cat_id) ON DELETE SET NULL);''') 
+                CONSTRAINT fk_category
+                    FOREIGN KEY(cat_id)
+                    REFERENCES category(cat_id) 
+                    ON DELETE SET NULL
+                );''') 
 
 c.execute('''CREATE TABLE IF NOT EXISTS bills (
                 bill_id INTEGER PRIMARY KEY,

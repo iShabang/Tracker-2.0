@@ -88,7 +88,7 @@ class tableModel(QtCore.QAbstractTableModel):
         self.beginRemoveRows(parent, row, row + count - 1) 
 
         if itemType == "trans":
-            func = db.DelTrans
+            func = db.delTransByID
         elif itemType == "cat":
             func = db.DelCategory
 
@@ -108,6 +108,9 @@ class tableModel(QtCore.QAbstractTableModel):
                 return self.__headers[section]
             if orientation == QtCore.Qt.Vertical:
                 return "  "
+
+    def updateConstraint(self, row):
+        db.delTransByCat(self._data[row][0] 
 
 
 if __name__ == "__main__":

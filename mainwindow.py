@@ -123,6 +123,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def getTransactions(self):
         self.trans = db.getTransByDate(lowdate=self.lowdate, highdate=self.highdate)
+        print(self.trans)
 
     def getIncomeCatList(self):
         self.incomeCatList = uitools.findIncomeCategory()
@@ -211,6 +212,12 @@ class MainWindow(QtWidgets.QMainWindow):
         addButton.clicked.connect(self.addCatDialog)
 
         def deleteCategory():
+            selectedRows = catTable.selectionModel().selectedRows()
+            indices = []
+            for i in selectedRows:
+                indices.append(i.row())
+            indices.sort()
+            self.deleteCondDialog(indices)
             self.deleteRows(catTable,model,"cat")
 
         deleteButton = QtWidgets.QPushButton("Delete", catDialog)
@@ -226,6 +233,29 @@ class MainWindow(QtWidgets.QMainWindow):
         mainlayout.addWidget(closeButton)
         catDialog.setLayout(mainlayout)
         catDialog.exec_()
+
+    def deleteCondDialog(self, indices):
+        condDialog = QtWidgets.QDialog()
+        condDialog.setWindowTitle("Alert!")
+        condDialog.setGeometry(10,10,100,100)
+        yesBttn = QtWidgets.QPushButton("Yes",condDialog)
+        noBttn = QtWidgets.QPushButton("No",condDialog)
+
+        def yes():
+            condDialog.close()
+
+        yesBttn.clicked.connect(yes)
+        noBttn.clicked.connect(condDialog.close)
+        message = "Would you like to delete all items under this category?"
+        mssgLabel = QtWidgets.QLabel(message, condDialog)
+        hlayout = QtWidgets.QHBoxLayout()
+        hlayout.addWidget(yesBttn)
+        hlayout.addWidget(noBttn)
+        vlayout = QtWidgets.QVBoxLayout()
+        vlayout.addWidget(mssgLabel)
+        vlayout.addLayout(hlayout)
+        condDialog.setLayout(vlayout)
+        condDialog.exec_()
 
     def datePopup(self):
         dateEdit = QtWidgets.QDateEdit()

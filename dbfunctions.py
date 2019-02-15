@@ -4,6 +4,7 @@ def DbConnectQuery(func):
     def wrapper(*args,**kwargs):
         connection = sqlite3.connect('tracker.db')
         cursor = connection.cursor()
+        cursor.execute("PRAGMA foreign_keys = ON;") 
         data = func(cursor,*args,**kwargs)
         connection.close()
         return data
@@ -13,6 +14,7 @@ def DbConnectAction(func):
     def wrapper(*args,**kwargs):
         connection = sqlite3.connect('tracker.db')
         cursor = connection.cursor()
+        cursor.execute("PRAGMA foreign_keys = ON;") 
         func(cursor,*args,**kwargs)
         connection.commit()
         connection.close()
@@ -27,15 +29,18 @@ def AddManyTrans(cursor, values):
     cursor.executemany("INSERT INTO trans(name, date, amount, cat_id) VALUES (?,?,?,?);", values)
 
 @DbConnectAction
-def DelTrans(cursor, id_num):
+def delTransByID(cursor, id_num):
     cursor.execute("DELETE FROM trans WHERE trans_id=?;", (id_num,))
+
+def delTransbyCat(cursor, cat_id):
+    cursor.executemany("DELETE FROM trans WHERE cat_id=?;", (cat_id,))
 
 @DbConnectAction
 def AddCategory(cursor, name, income):
     cursor.execute("INSERT INTO category(name, income) VALUES (?,?);", (name,income))
 
 @DbConnectAction
-def DelCategory(cursor, cat_id):
+def DelCategoryByID(cursor, cat_id):
     cursor.execute("DELETE FROM category WHERE cat_id=?;", (cat_id,))
 
 @DbConnectAction
@@ -56,6 +61,14 @@ def getLastTrans(cursor):
 
 @DbConnectQuery
 def getTransByDate(cursor, lowdate, highdate):
+    cursor.execute('''
+    SELECT trans.trans_id, trans.name, trans.date, printf("%.2f", trans.amount), category.name
+    FROM trans LEFT JOIN category ON trans.cat_id = category.cat_id
+    WHERE date >= ? AND date <= ?''',(lowdate,highdate))
+    return cursor.fetchall()
+
+@DbConnectQuery
+def getTransByDate2(cursor, lowdate, highdate):
     cursor.execute('''
     SELECT trans.trans_id, trans.name, trans.date, printf("%.2f", trans.amount), category.name
     FROM trans INNER JOIN category ON trans.cat_id = category.cat_id
