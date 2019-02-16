@@ -123,13 +123,20 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def getTransactions(self):
         self.trans = db.getTransByDate(lowdate=self.lowdate, highdate=self.highdate)
-        print(self.trans)
 
     def getIncomeCatList(self):
         self.incomeCatList = uitools.findIncomeCategory()
 
     def getCategories(self):
         self.categories = db.GetAllCategories()
+
+    def getSelectedRows(self, table):
+        selectedRows = table.selectionModel().selectedRows()
+        indices = []
+        for i in selectedRows:
+            indices.append(i.row())
+        indices.sort()
+        return indices
         
     def buildCatDict(self):
         self._categoriesDict = {}
@@ -212,12 +219,8 @@ class MainWindow(QtWidgets.QMainWindow):
         addButton.clicked.connect(self.addCatDialog)
 
         def deleteCategory():
-            selectedRows = catTable.selectionModel().selectedRows()
-            indices = []
-            for i in selectedRows:
-                indices.append(i.row())
-            indices.sort()
-            self.deleteCondDialog(indices)
+            selectedRows = self.getSelectedRows(catTable)
+            self.deleteCondDialog()
             self.deleteRows(catTable,model,"cat")
 
         deleteButton = QtWidgets.QPushButton("Delete", catDialog)
@@ -234,18 +237,14 @@ class MainWindow(QtWidgets.QMainWindow):
         catDialog.setLayout(mainlayout)
         catDialog.exec_()
 
-    def deleteCondDialog(self, indices):
+    def deleteCondDialog(self):
         condDialog = QtWidgets.QDialog()
         condDialog.setWindowTitle("Alert!")
         condDialog.setGeometry(10,10,100,100)
         yesBttn = QtWidgets.QPushButton("Yes",condDialog)
         noBttn = QtWidgets.QPushButton("No",condDialog)
-
-        def yes():
-            condDialog.close()
-
-        yesBttn.clicked.connect(yes)
-        noBttn.clicked.connect(condDialog.close)
+        yesBttn.clicked.connect(condDialog.accept)
+        noBttn.clicked.connect(condDialog.reject)
         message = "Would you like to delete all items under this category?"
         mssgLabel = QtWidgets.QLabel(message, condDialog)
         hlayout = QtWidgets.QHBoxLayout()
