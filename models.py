@@ -109,8 +109,8 @@ class tableModel(QtCore.QAbstractTableModel):
             if orientation == QtCore.Qt.Vertical:
                 return "  "
 
-    def updateConstraint(self, row):
-        db.delTransByCat(self._data[row][0] 
+    def updateConstraint(self, rows):
+        db.delTransByCat(self._data[row][0]) 
 
 
 if __name__ == "__main__":
