@@ -219,9 +219,15 @@ class MainWindow(QtWidgets.QMainWindow):
         addButton.clicked.connect(self.addCatDialog)
 
         def deleteCategory():
-            selectedRows = self.getSelectedRows(catTable)
-            self.deleteCondDialog()
-            self.deleteRows(catTable,model,"cat")
+            msgBox = QtWidgets.QMessageBox()
+            msgBox.setText("Would you like to delete all items under this category?")
+            msgBox.setStandardButtons(QtWidgets.QMessageBox.Yes|QtWidgets.QMessageBox.No)
+            test = msgBox.exec_()
+            if test == QtWidgets.QMessageBox.Yes:
+                cascade = True
+            else:
+                cascade = False
+            self.deleteRows(catTable,model,"cat",cascade)
 
         deleteButton = QtWidgets.QPushButton("Delete", catDialog)
         deleteButton.clicked.connect(deleteCategory)
@@ -236,25 +242,6 @@ class MainWindow(QtWidgets.QMainWindow):
         mainlayout.addWidget(closeButton)
         catDialog.setLayout(mainlayout)
         catDialog.exec_()
-
-    def deleteCondDialog(self):
-        condDialog = QtWidgets.QDialog()
-        condDialog.setWindowTitle("Alert!")
-        condDialog.setGeometry(10,10,100,100)
-        yesBttn = QtWidgets.QPushButton("Yes",condDialog)
-        noBttn = QtWidgets.QPushButton("No",condDialog)
-        yesBttn.clicked.connect(condDialog.accept)
-        noBttn.clicked.connect(condDialog.reject)
-        message = "Would you like to delete all items under this category?"
-        mssgLabel = QtWidgets.QLabel(message, condDialog)
-        hlayout = QtWidgets.QHBoxLayout()
-        hlayout.addWidget(yesBttn)
-        hlayout.addWidget(noBttn)
-        vlayout = QtWidgets.QVBoxLayout()
-        vlayout.addWidget(mssgLabel)
-        vlayout.addLayout(hlayout)
-        condDialog.setLayout(vlayout)
-        condDialog.exec_()
 
     def datePopup(self):
         dateEdit = QtWidgets.QDateEdit()
@@ -274,7 +261,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.listModel.changeData(self.stats)
         
 
-    def deleteRows(self, table, model, itemType):
+    def deleteRows(self, table, model, itemType, cascade=False):
         selectedRows = table.selectionModel().selectedRows()
         indices = []
         for i in selectedRows:
@@ -283,7 +270,7 @@ class MainWindow(QtWidgets.QMainWindow):
         difference = 0
         for index in indices:
             row = index-difference
-            model.removeRows(row=row,count=1, itemType=itemType)
+            model.removeRows(row=row,count=1, itemType=itemType, cascade=cascade)
             difference += 1
 
     def openAddDialog(self):
