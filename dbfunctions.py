@@ -32,15 +32,16 @@ def AddManyTrans(cursor, values):
 def delTransByID(cursor, id_num):
     cursor.execute("DELETE FROM trans WHERE trans_id=?;", (id_num,))
 
-def delTransbyCat(cursor, cat_id):
-    cursor.executemany("DELETE FROM trans WHERE cat_id=?;", (cat_id,))
+@DbConnectAction
+def delTransByCat(cursor, cat_id):
+    cursor.execute("DELETE FROM trans WHERE cat_id=?;", (cat_id,))
 
 @DbConnectAction
 def AddCategory(cursor, name, income):
     cursor.execute("INSERT INTO category(name, income) VALUES (?,?);", (name,income))
 
 @DbConnectAction
-def DelCategoryByID(cursor, cat_id):
+def delCategoryByID(cursor, cat_id):
     cursor.execute("DELETE FROM category WHERE cat_id=?;", (cat_id,))
 
 @DbConnectAction
