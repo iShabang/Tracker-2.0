@@ -14,7 +14,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setCurrentDate()
         self.setDateInterval()
         self.buildMenu()
-        self.getIncomeCatList()
         self.getCategories()
         self.buildCatDict()
         self.setHeaders(["ID","Name","Date","Amount","Category"])
@@ -124,9 +123,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def getTransactions(self):
         self.trans = db.getTransByDate(lowdate=self.lowdate, highdate=self.highdate)
 
-    def getIncomeCatList(self):
-        self.incomeCatList = uitools.findIncomeCategory()
-
     def getCategories(self):
         self.categories = db.GetAllCategories()
 
@@ -179,8 +175,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self._mapper.toFirst()
 
     def calcStats(self):
-        amountSpent = sum(uitools.getColumnSpent(self.trans, 3, self.incomeCatList))
-        amountEarned = sum(uitools.getColumnEarned(self.trans, 3, self.incomeCatList))
+        amountSpent = db.totalSpent(self.lowdate,self.highdate)[0]
+        amountEarned = db.totalEarned(self.lowdate,self.highdate)[0]
         amountSaved = amountEarned - amountSpent
         self.stats = [[str(amountSpent),str(amountEarned),str(amountSaved)]]
         
