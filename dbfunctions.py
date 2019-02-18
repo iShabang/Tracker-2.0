@@ -53,6 +53,30 @@ def DelBill(cursor, bill_id):
     cursor.execute("DELETE FROM bills WHERE bill_id=?", (bill_id,))
 
 @DbConnectQuery
+def findCategory(cursor, trans_id):
+    cursor.execute('''
+    SELECT trans.cat_id
+    FROM trans
+    WHERE trans.trans_id = ?''',(trans_id,))
+    return cursor.fetchone()
+
+@DbConnectQuery
+def totalEarned(cursor, lowdate, highdate):
+    cursor.execute('''
+    SELECT SUM(trans.amount) 
+    FROM trans LEFT JOIN category ON trans.cat_id = category.cat_id
+    WHERE category.income = 1 AND date >= ? AND date <= ?''',(lowdate,highdate))
+    return cursor.fetchone()
+
+@DbConnectQuery
+def totalSpent(cursor, lowdate, highdate):
+    cursor.execute('''
+    SELECT SUM(trans.amount)
+    FROM trans LEFT JOIN category ON trans.cat_id = category.cat_id
+    WHERE category.income = 0 AND date >= ? AND date <= ?''',(lowdate,highdate))
+    return cursor.fetchone()
+
+@DbConnectQuery
 def getLastTrans(cursor):
     cursor.execute('''
     SELECT trans.trans_id, trans.name, trans.date, printf("%.2f",trans.amount), category.name
