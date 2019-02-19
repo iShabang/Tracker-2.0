@@ -178,7 +178,7 @@ class MainWindow(QtWidgets.QMainWindow):
         amountSpent = db.totalSpent(self.lowdate,self.highdate)[0]
         amountEarned = db.totalEarned(self.lowdate,self.highdate)[0]
         amountSaved = amountEarned - amountSpent
-        self.stats = [[str(amountSpent),str(amountEarned),str(amountSaved)]]
+        self.stats = [[str(round(amountSpent,2)),str(round(amountEarned,2)),str(round(amountSaved,2))]]
         
     def isEmpty(self):
         if len(self.trans) == 0:
