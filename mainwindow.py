@@ -105,7 +105,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.tableModel = model
 
     def setProxyModel(self, model):
-        self.proxyModel = QtCore.QSortFilterProxyModel()
+        self.proxyModel = models.floatProxyModel()
         self.proxyModel.setSourceModel(model)
 
 
