@@ -177,8 +177,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def calcStats(self):
         amountSpent = db.totalSpent(self.lowdate,self.highdate)[0]
         amountEarned = db.totalEarned(self.lowdate,self.highdate)[0]
-        amountSaved = amountEarned - amountSpent
-        self.stats = [[str(round(amountSpent,2)),str(round(amountEarned,2)),str(round(amountSaved,2))]]
+        amountSaved = float(amountEarned) - float(amountSpent)
+        self.stats = [[amountSpent,amountEarned,str(round(amountSaved,2))]]
         
     def isEmpty(self):
         if len(self.trans) == 0:
