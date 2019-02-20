@@ -47,6 +47,7 @@ class listModel(QtCore.QAbstractTableModel):
         self.dataChanged.emit(earnedIndex, earnedIndex)
         self.dataChanged.emit(savedIndex, savedIndex)
 
+
 class tableModel(QtCore.QAbstractTableModel):
     def __init__(self, data = [[]], headers = [], parent = None):
         QtCore.QAbstractTableModel.__init__(self,parent)
@@ -117,16 +118,17 @@ class tableModel(QtCore.QAbstractTableModel):
         db.delTransByCat(self._data[row][0]) 
 
 
-if __name__ == "__main__":
-    app = QtWidgets.QApplication([])
+class floatProxyModel(QtCore.QSortFilterProxyModel):
+    def lessThan(self, left, right):
+        sourceLeft = self.sourceModel().data(left,role=QtCore.Qt.DisplayRole)
+        sourceRight = self.sourceModel().data(right,role=QtCore.Qt.DisplayRole)
+        try:
+            return float(sourceLeft) < float(sourceRight)
+        except: 
+            pass
 
-    data = dbfunctions.GetTransByDateInterval(lowdate='2017-00-00', highdate='2019-00-00')
-    headers = ["Transaction ID", "Name", "Date", "Amount", "Category"]
+        return sourceLeft < sourceRight
 
-    tableView = QtWidgets.QTableView()
-    tableView.show()
-    tableModel = tableModel(data=data, headers=headers)
-    tableModel.insertRows(0,1)
-    tableView.setModel(tableModel)
 
-    app.exec_()
+            
+
