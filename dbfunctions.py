@@ -93,14 +93,6 @@ def getTransByDate(cursor, lowdate, highdate):
     return cursor.fetchall()
 
 @DbConnectQuery
-def getTransByDate2(cursor, lowdate, highdate):
-    cursor.execute('''
-    SELECT trans.trans_id, trans.name, trans.date, printf("%.2f", trans.amount), category.name
-    FROM trans INNER JOIN category ON trans.cat_id = category.cat_id
-    WHERE date >= ? AND date <= ?''',(lowdate,highdate))
-    return cursor.fetchall()
-
-@DbConnectQuery
 def GetTransByName(cursor, name):
     cursor.execute('''
     SELECT trans.trans_id, trans.name, trans.date, trans.amount, category.name
