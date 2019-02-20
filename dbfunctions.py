@@ -63,7 +63,7 @@ def findCategory(cursor, trans_id):
 @DbConnectQuery
 def totalEarned(cursor, lowdate, highdate):
     cursor.execute('''
-    SELECT SUM(trans.amount) 
+    SELECT printf("%.2f",SUM(trans.amount))
     FROM trans LEFT JOIN category ON trans.cat_id = category.cat_id
     WHERE category.income = 1 AND date >= ? AND date <= ?''',(lowdate,highdate))
     return cursor.fetchone()
@@ -71,7 +71,7 @@ def totalEarned(cursor, lowdate, highdate):
 @DbConnectQuery
 def totalSpent(cursor, lowdate, highdate):
     cursor.execute('''
-    SELECT SUM(trans.amount)
+    SELECT printf("%.2f",SUM(trans.amount))
     FROM trans LEFT JOIN category ON trans.cat_id = category.cat_id
     WHERE category.income = 0 AND date >= ? AND date <= ?''',(lowdate,highdate))
     return cursor.fetchone()
