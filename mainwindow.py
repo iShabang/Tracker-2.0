@@ -55,14 +55,14 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def setupWindow(self):
         self.setWindowTitle("Full Test Application")
-        self.setGeometry(10,10,600,400)
-        self.centerScreen()
+        self.resize(QtWidgets.QDesktopWidget().availableGeometry().size()*0.7)
+        self.centerScreen(self)
 
-    def centerScreen(self):
-        rectangle = self.frameGeometry()
+    def centerScreen(self, widget):
+        rectangle = widget.frameGeometry()
         centerPoint = QtWidgets.QDesktopWidget().availableGeometry().center()
         rectangle.moveCenter(centerPoint)
-        self.move(rectangle.topLeft())
+        widget.move(rectangle.topLeft())
 
     def buildMenu(self):
         self.mainMenu = self.menuBar()
@@ -206,7 +206,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def categoryDialog(self):
         catDialog = QtWidgets.QDialog()
         catDialog.setWindowTitle("Categories")
-        catDialog.setGeometry(10,10,600,400)
+        catDialog.resize(QtWidgets.QDesktopWidget().availableGeometry().size()*0.5)
+        self.centerScreen(catDialog)
         model = models.tableModel(data=self.categories, headers=["ID","Name","Income"])
         proxyModel = QtCore.QSortFilterProxyModel()
         proxyModel.setSourceModel(model)
@@ -272,6 +273,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def openAddDialog(self):
         addWindow = QtWidgets.QDialog()
         addWindow.setWindowTitle("Adding Transaction")
+        self.centerScreen(addWindow)
         edit_name = QtWidgets.QLineEdit()
         edit_name.setPlaceholderText('Name')
         check_float = QtGui.QDoubleValidator()
@@ -315,6 +317,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def addCatDialog(self):
         addWindow = QtWidgets.QDialog()
         addWindow.setWindowTitle("Adding Category")
+        self.centerScreen(addWindow)
         edit_category = QtWidgets.QLineEdit()
         edit_category.setPlaceholderText('Category')
         checkBox_income = QtWidgets.QCheckBox('Income')
