@@ -52,7 +52,7 @@ class tableModel(QtCore.QAbstractTableModel):
     def __init__(self, data = [[]], headers = [], parent = None):
         QtCore.QAbstractTableModel.__init__(self,parent)
         self._data = data
-        self.__headers = headers
+        self._headers = headers
 
     def isEmpty(self):
         if len(self._data) == 0:
@@ -65,6 +65,9 @@ class tableModel(QtCore.QAbstractTableModel):
         if self.isEmpty():
             return 0
         return len(self._data[0])
+    
+    def flags(self,index):
+        return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
 
     def data(self, index, role):
         if self.isEmpty():
@@ -75,6 +78,23 @@ class tableModel(QtCore.QAbstractTableModel):
             column = index.column()
             value = self._data[row][column]
             return value
+
+        if role == QtCore.Qt.EditRole:
+            return self._data[index.row()][index.column()]
+    
+    def setData(self, index, value, role = QtCore.Qt.EditRole):
+        if role == QtCore.Qt.EditRole:
+            rowIndex = index.row()
+            colIndex = index.column()
+            if self._data[rowIndex][colIndex] == value:
+                return True
+            row = self._data[rowIndex]
+            self._data[rowIndex][colIndex] = value
+            self.dataChanged.emit(index,index)
+            cat_id = db.getCatID(row[4])[0]
+            db.updateTrans(row[0],row[1],row[2],float(row[3]),cat_id)
+            return True
+        return False
 
     def insertRows(self, position, rows, data, parent = QtCore.QModelIndex()):
         self.beginInsertRows(parent, position, position + rows - 1)
@@ -110,7 +130,7 @@ class tableModel(QtCore.QAbstractTableModel):
 
         if role == QtCore.Qt.DisplayRole:
             if orientation == QtCore.Qt.Horizontal:
-                return self.__headers[section]
+                return self._headers[section]
             if orientation == QtCore.Qt.Vertical:
                 return "  "
 
