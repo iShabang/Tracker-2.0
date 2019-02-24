@@ -20,6 +20,10 @@ def DbConnectAction(func):
         connection.close()
     return wrapper
 
+
+################################################################
+#ADD and DELETE
+################################################################
 @DbConnectAction
 def AddTrans(cursor, values):
     cursor.execute("INSERT INTO trans(name, date, amount, cat_id) VALUES (?,?,?,?);", values)
@@ -52,6 +56,10 @@ def AddBill(cursor, values):
 def DelBill(cursor, bill_id):
     cursor.execute("DELETE FROM bills WHERE bill_id=?", (bill_id,))
 
+
+################################################################
+#Queries
+################################################################
 @DbConnectQuery
 def findCategory(cursor, trans_id):
     cursor.execute('''
@@ -139,4 +147,14 @@ def getCatNamesType(cursor):
     SELECT category.name, category.income
     FROM category""")
     return cursor.fetchall()
+
+################################################################
+#UPDATE Statements
+################################################################
+@DbConnectAction
+def updateTrans(cursor, transId, name, date, amount, catId):
+    cursor.execute('''
+    UPDATE trans
+    SET name=?, date=?, amount=?, cat_id=?
+    WHERE trans_id = ?;''', (name,date,amount,catId,transId))
 
