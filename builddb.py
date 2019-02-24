@@ -18,11 +18,11 @@ c.execute('''CREATE TABLE IF NOT EXISTS trans (
                 name TEXT, 
                 date TEXT, 
                 amount REAL,
-                cat_id INTEGER,
+                cat_id INTEGER DEFAULT 1,
                 CONSTRAINT fk_category
                     FOREIGN KEY(cat_id)
                     REFERENCES category(cat_id) 
-                    ON DELETE SET NULL
+                    ON DELETE SET DEFAULT
                 );''') 
 
 c.execute('''CREATE TABLE IF NOT EXISTS bills (
@@ -35,6 +35,8 @@ c.execute('''CREATE TABLE IF NOT EXISTS bills (
                 REFERENCES category(cat_id) ON DELETE SET NULL,
                 FOREIGN KEY(last_payment) 
                 REFERENCES trans(trans_id) ON DELETE SET NULL);''')
+
+c.execute("INSERT INTO category(name, income) VALUES (?,?);", ("NONE",0))
 
 #Commit/Save Changes
 conn.commit()
