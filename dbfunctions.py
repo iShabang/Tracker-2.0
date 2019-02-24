@@ -61,11 +61,19 @@ def DelBill(cursor, bill_id):
 #Queries
 ################################################################
 @DbConnectQuery
-def findCategory(cursor, trans_id):
+def findTransCategory(cursor, trans_id):
     cursor.execute('''
     SELECT trans.cat_id
     FROM trans
     WHERE trans.trans_id = ?''',(trans_id,))
+    return cursor.fetchone()
+
+@DbConnectQuery
+def getCatID(cursor, name):
+    cursor.execute('''
+    SELECT category.cat_id
+    FROM category
+    WHERE category.name = ?;''',(name,))
     return cursor.fetchone()
 
 @DbConnectQuery
