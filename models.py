@@ -67,6 +67,8 @@ class TableModel(QtCore.QAbstractTableModel):
         return len(self._data[0])
     
     def flags(self,index):
+        if index.column()==0:
+            return QtCore.Qt.ItemIsSelectable
         return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
 
     def data(self, index, role):
@@ -155,6 +157,12 @@ class CatTableModel(TableModel):
         super().__init__()
         self._data = data
         self._headers = headers
+
+    def flags(self,index):
+        if index.column()==0 or index.row()==0:
+            return QtCore.Qt.ItemIsSelectable
+
+        return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
 
     def setData(self, index, value, itemType, role = QtCore.Qt.EditRole):
         if role == QtCore.Qt.EditRole:
