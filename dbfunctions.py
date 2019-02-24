@@ -166,3 +166,10 @@ def updateTrans(cursor, transId, name, date, amount, catId):
     SET name=?, date=?, amount=?, cat_id=?
     WHERE trans_id = ?;''', (name,date,amount,catId,transId))
 
+@DbConnectAction
+def updateCat(cursor, cat_id, name, income):
+    cursor.execute('''
+    UPDATE category
+    SET name=?, income=?
+    WHERE cat_id = ?;''', (name,income,cat_id))
+
