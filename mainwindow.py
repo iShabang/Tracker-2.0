@@ -21,7 +21,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.getTransactions()
         self.buildStatList()
         self.buildFilter()
-        model = models.tableModel(data=self.trans, headers=self.headers)
+        model = models.TableModel(data=self.trans, headers=self.headers)
         self.setModel(model)
         self.setProxyModel(self.tableModel)
         self.mainTable = self.buildTable(model=self.tableModel, proxyModel=self.proxyModel)
@@ -125,7 +125,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.trans = [list(i) for i in query]
 
     def getCategories(self):
-        self.categories = db.GetAllCategories()
+        query = db.GetAllCategories()
+        self.categories = [list(i) for i in query]
 
     def getSelectedRows(self, table):
         selectedRows = table.selectionModel().selectedRows()
@@ -160,7 +161,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.calcStats()
             data = self.stats
         self.statList = QtWidgets.QTableView()
-        self.listModel = models.listModel(data=data)
+        self.listModel = models.StatModel(data=data)
         self.statList.setModel(self.listModel)
         self.spentLabel = QtWidgets.QLabel('Spent:')
         self.earnedLabel = QtWidgets.QLabel('Earned:')
@@ -209,7 +210,7 @@ class MainWindow(QtWidgets.QMainWindow):
         catDialog.setWindowTitle("Categories")
         catDialog.resize(QtWidgets.QDesktopWidget().availableGeometry().size()*0.5)
         self.centerScreen(catDialog)
-        model = models.tableModel(data=self.categories, headers=["ID","Name","Income"])
+        model = models.CatTableModel(data=self.categories, headers=["ID","Name","Income"])
         proxyModel = QtCore.QSortFilterProxyModel()
         proxyModel.setSourceModel(model)
         catTable = self.buildTable(model, proxyModel)
