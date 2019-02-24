@@ -2,7 +2,7 @@ from PyQt5 import QtCore, QtWidgets, QtGui
 import dbfunctions as db
 
 
-class listModel(QtCore.QAbstractTableModel):
+class StatModel(QtCore.QAbstractTableModel):
     def __init__(self, data = [[]], parent = None):
         QtCore.QAbstractTableModel.__init__(self, parent)
         self._data = data
@@ -48,7 +48,7 @@ class listModel(QtCore.QAbstractTableModel):
         self.dataChanged.emit(savedIndex, savedIndex)
 
 
-class tableModel(QtCore.QAbstractTableModel):
+class TableModel(QtCore.QAbstractTableModel):
     def __init__(self, data = [[]], headers = [], parent = None):
         QtCore.QAbstractTableModel.__init__(self,parent)
         self._data = data
@@ -82,15 +82,15 @@ class tableModel(QtCore.QAbstractTableModel):
         if role == QtCore.Qt.EditRole:
             return self._data[index.row()][index.column()]
     
-    def setData(self, index, value, role = QtCore.Qt.EditRole):
+    def setData(self, index, value, itemType, role = QtCore.Qt.EditRole):
         if role == QtCore.Qt.EditRole:
             rowIndex = index.row()
             colIndex = index.column()
             if self._data[rowIndex][colIndex] == value:
                 return True
-            row = self._data[rowIndex]
             self._data[rowIndex][colIndex] = value
             self.dataChanged.emit(index,index)
+            row = self._data[rowIndex]
             cat_id = db.getCatID(row[4])[0]
             db.updateTrans(row[0],row[1],row[2],float(row[3]),cat_id)
             return True
@@ -150,5 +150,22 @@ class floatProxyModel(QtCore.QSortFilterProxyModel):
         return sourceLeft < sourceRight
 
 
-            
+class CatTableModel(TableModel):
+    def __init__(self, data = [[]], headers = [], parent = None):
+        super().__init__()
+        self._data = data
+        self._headers = headers
+
+    def setData(self, index, value, itemType, role = QtCore.Qt.EditRole):
+        if role == QtCore.Qt.EditRole:
+            rowIndex = index.row()
+            colIndex = index.column()
+            if self._data[rowIndex][colIndex] == value:
+                return True
+            self._data[rowIndex][colIndex] = value
+            self.dataChanged.emit(index,index)
+            row = self._data[rowIndex]
+            db.updateCat(row[0],row[1],row[2])
+            return True
+        return False
 
