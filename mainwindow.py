@@ -121,7 +121,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.currentDate = QtCore.QDate.currentDate()
 
     def getTransactions(self):
-        self.trans = db.getTransByDate(lowdate=self.lowdate, highdate=self.highdate)
+        query = db.getTransByDate(lowdate=self.lowdate, highdate=self.highdate)
+        self.trans = [list(i) for i in query]
 
     def getCategories(self):
         self.categories = db.GetAllCategories()
