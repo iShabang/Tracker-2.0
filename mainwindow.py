@@ -72,9 +72,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.createActions()
 
-        self.fileMenu.addAction(self.printAct)
         self.fileMenu.addAction(self.addCatAct)
-        self.editMenu.addAction('Copy')
         self.editMenu.addAction(self.catWindow)
         self.editMenu.addAction(self.delAct)
         self.reportMenu.addAction('Week')
@@ -84,7 +82,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def createActions(self):
         self.printAct = QtWidgets.QAction()
         self.printAct.setText("Print")
-        #self.printAct.triggered.connect()
         
         self.addCatAct = QtWidgets.QAction()
         self.addCatAct.setText("Add Category")
@@ -97,6 +94,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.catWindow = QtWidgets.QAction()
         self.catWindow.setText("Categories")
         self.catWindow.triggered.connect(self.categoryDialog)
+
+    def setTitle(self, title):
+        self.title = title
 
     def setHeaders(self, headers):
         self.headers = headers
