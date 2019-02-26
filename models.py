@@ -176,10 +176,11 @@ class CatTableModel(TableModel):
             return None
         
         if role == QtCore.Qt.DisplayRole:
-            row = index.row()
-            column = index.column()
-            value = self._data[row][column]
-            return value
+            if index.column() < 2:
+                row = index.row()
+                column = index.column()
+                value = self._data[row][column]
+                return value
 
         if role == QtCore.Qt.EditRole:
             return self._data[index.row()][index.column()]
