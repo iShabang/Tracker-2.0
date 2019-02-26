@@ -84,8 +84,10 @@ class TableModel(QtCore.QAbstractTableModel):
         if role == QtCore.Qt.EditRole:
             return self._data[index.row()][index.column()]
     
-    def setData(self, index, value, itemType, role = QtCore.Qt.EditRole):
+    def setData(self, index, value, role = QtCore.Qt.EditRole):
         if role == QtCore.Qt.EditRole:
+            if not index.isValid():
+                return False
             rowIndex = index.row()
             colIndex = index.column()
             if self._data[rowIndex][colIndex] == value:
@@ -162,10 +164,37 @@ class CatTableModel(TableModel):
         if index.column()==0 or index.row()==0:
             return QtCore.Qt.ItemIsSelectable
 
+        if index.column()==2:
+            return (QtCore.Qt.ItemIsUserCheckable |
+                    QtCore.Qt.ItemIsEditable |
+                    QtCore.Qt.ItemIsEnabled)
+
         return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
 
-    def setData(self, index, value, itemType, role = QtCore.Qt.EditRole):
+    def data(self, index, role):
+        if self.isEmpty():
+            return None
+        
+        if role == QtCore.Qt.DisplayRole:
+            row = index.row()
+            column = index.column()
+            value = self._data[row][column]
+            return value
+
         if role == QtCore.Qt.EditRole:
+            return self._data[index.row()][index.column()]
+
+        if role == QtCore.Qt.CheckStateRole:
+            if index.column() == 2:
+                if self._data[index.row()][index.column()] == 1:
+                    return QtCore.Qt.Checked
+                elif self._data[index.row()][index.column()] == 0:
+                    return QtCore.Qt.Unchecked
+
+    def setData(self, index, value, role = QtCore.Qt.EditRole):
+        if role == QtCore.Qt.EditRole:
+            if not index.isValid():
+                return False
             rowIndex = index.row()
             colIndex = index.column()
             if self._data[rowIndex][colIndex] == value:
@@ -175,5 +204,15 @@ class CatTableModel(TableModel):
             row = self._data[rowIndex]
             db.updateCat(row[0],row[1],row[2])
             return True
+
+        if role == QtCore.Qt.CheckStateRole:
+            if index.column() == 2:
+                if value == QtCore.Qt.Checked:
+                    self._data[index.row()][index.column()] = 1
+                elif value == QtCore.Qt.Unchecked:
+                    self._data[index.row()][index.column()] = 0
+                row = self._data[index.row()]
+                db.updateCat(row[0],row[1],row[2])
+                return True
         return False
 
