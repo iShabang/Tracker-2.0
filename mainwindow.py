@@ -31,6 +31,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.addTransBttn.setSizePolicy(QtWidgets.QSizePolicy.Expanding,QtWidgets.QSizePolicy.Expanding)
         self.addTransBttn.clicked.connect(self.openAddDialog)
 
+        title = "Displaying: {} to {}".format(self.lowdate,self.highdate)
+        self.titleLabel = QtWidgets.QLabel(self)
+        self.setTitle(title)
+
         """Top Grid"""
         self.topGrid = QtWidgets.QGridLayout()
         self.topGrid.addWidget(self.spentLabel,0,0)
@@ -40,6 +44,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.topGrid.addWidget(self.spentEdit,0,1)
         self.topGrid.addWidget(self.earnedEdit,1,1)
         self.topGrid.addWidget(self.savedEdit,2,1)
+        self.topGrid.addWidget(self.titleLabel,2,3)
         self.topGrid.addWidget(self.filterLabel,2,4)
         self.topGrid.addWidget(self.filterComboBox,2,5)
         self.topGrid.addWidget(self.filterEdit,2,6)
@@ -96,7 +101,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.catWindow.triggered.connect(self.categoryDialog)
 
     def setTitle(self, title):
-        self.title = title
+        self.titleLabel.setText(title)
 
     def setHeaders(self, headers):
         self.headers = headers
@@ -114,7 +119,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.lowdate = lowdate
             self.highdate = highdate
         else:
-            self.lowdate = self.currentDate.toString("yyyy-MM-00")
+            self.lowdate = self.currentDate.toString("yyyy-MM-01")
             self.highdate = self.currentDate.toString("yyyy-MM-dd")
 
     def setCurrentDate(self):
