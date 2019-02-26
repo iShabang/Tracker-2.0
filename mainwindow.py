@@ -21,7 +21,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.getTransactions()
         self.buildStatList()
         self.buildFilter()
-        model = models.TableModel(data=self.trans, headers=self.headers)
+        model = models.MainTableModel(data=self.trans, headers=self.headers)
         self.setModel(model)
         self.setProxyModel(self.tableModel)
         self.mainTable = self.buildTable(model=self.tableModel, proxyModel=self.proxyModel)

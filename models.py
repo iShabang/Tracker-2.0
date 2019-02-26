@@ -1,7 +1,9 @@
 from PyQt5 import QtCore, QtWidgets, QtGui
 import dbfunctions as db
 
-
+####################################################################
+#STAT MODEL
+####################################################################
 class StatModel(QtCore.QAbstractTableModel):
     def __init__(self, data = [[]], parent = None):
         QtCore.QAbstractTableModel.__init__(self, parent)
@@ -48,7 +50,10 @@ class StatModel(QtCore.QAbstractTableModel):
         self.dataChanged.emit(savedIndex, savedIndex)
 
 
-class TableModel(QtCore.QAbstractTableModel):
+####################################################################
+#MAIN TABLE MODEL
+####################################################################
+class MainTableModel(QtCore.QAbstractTableModel):
     def __init__(self, data = [[]], headers = [], parent = None):
         QtCore.QAbstractTableModel.__init__(self,parent)
         self._data = data
@@ -154,7 +159,7 @@ class floatProxyModel(QtCore.QSortFilterProxyModel):
         return sourceLeft < sourceRight
 
 
-class CatTableModel(TableModel):
+class CatTableModel(MainTableModel):
     def __init__(self, data = [[]], headers = [], parent = None):
         super().__init__()
         self._data = data
